@@ -18,5 +18,10 @@
   "bugs": {
     "url": "https://github.com/slavahatnuke/actives/issues"
   },
-  "homepage": "https://github.com/slavahatnuke/actives#readme"
+  "homepage": "https://github.com/slavahatnuke/actives#readme",
+  "babel": {
+  },
+  "dependencies": {
+    "babel-register": "^6.9.0"
+  }
 }
