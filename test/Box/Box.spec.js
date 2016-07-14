@@ -1,6 +1,6 @@
 require('chai').should();
 let expect = require('chai').expect;
-let Box = require('../../index').Box;
+let Box = require('../actives').Box;
 
 describe('Box', () => {
     it('should be created as new Box', () => {
