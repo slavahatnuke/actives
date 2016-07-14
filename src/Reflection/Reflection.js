@@ -96,8 +96,19 @@ module.exports = class Reflection {
         }
     }
 
-    static construct(_class, args) {
-        
+    static constructCreator(_class, args) {
+        let _a = args;
+
+        let a = args
+            .map(function (value, idx) {
+                return '_a[' + idx + ']';
+            })
+            .join(', ');
+
+        return function () {
+            //@@ improve with reflect if possible in the env
+            return eval('new _class(' + a + ')');
+        };
     }
 
 }

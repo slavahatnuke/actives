@@ -18,23 +18,10 @@ module.exports = class Creator {
 
     makeClass() {
         return (box) => {
-
             let dependencies = Dependency.create(this.definition)(box);
-
             let _class = this.definition.getDefinition();
-            // Reflection.construct(_class, dependencies)
-            let _a = dependencies;
 
-            let a = dependencies
-                .map(function (value, idx) {
-                    return '_a[' + idx + ']';
-                })
-                .join(', ');
-
-            return function () {
-                //@@ improve with reflect if possible in the env
-                return eval('new _class(' + a + ')');
-            };
+            return Reflection.constructCreator(_class, dependencies);
         };
     }
 
