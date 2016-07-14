@@ -59,7 +59,7 @@ module.exports = class Dependency {
             var dependencies = definition.getDependencies() || {};
             let names = box.keys().concat(Reflection.keys(dependencies));
 
-            names = [...new Set(names)];
+            names = [...new Set(names)]; // unique fields
             let context = Reflection.defineNames({}, names, (name) => box.get(name));
 
             // @@ think maybe need to save context to the definition to speedup
