@@ -4,33 +4,38 @@ module.exports = class Dependency {
     constructor(definition) {
         this.definition = definition;
 
-        this.isClass = Reflection.isClass(definition.getDefinition());
-        this.isFunction = !this.isClass && Reflection.isFunction(definition.getDefinition());
-
         this.hasDependencies = !!definition.getDependencies();
 
-        this.isArray = Reflection.isArray(definition.getDependencies());
-        this.isObject = !this.isArray && Reflection.isPureObject(definition.getDependencies());
+        this.isArrayDeps = Reflection.isArray(definition.getDependencies());
+        this.isObjectDeps = !this.isArrayDeps && Reflection.isPureObject(definition.getDependencies());
+    }
+
+    isClass() {
+        return Reflection.isClass(this.definition.getDefinition());
+    }
+
+    isFunction() {
+        return !this.isClass() && Reflection.isFunction(this.definition.getDefinition());
     }
 
     create() {
-        if (this.isFunction) {
-            return this.makeFunction();
+        if (this.isClass()) {
+            return this.makeClass();
         }
 
-        if (this.isClass) {
-            return this.makeClass();
+        if (this.isFunction()) {
+            return this.makeFunction();
         }
 
         return () => [];
     }
 
     makeFunction() {
-        if (!this.hasDependencies || this.isObject) {
+        if (!this.hasDependencies || this.isObjectDeps) {
             return Dependency.objectWay(this.definition);
         }
 
-        if (this.isArray) {
+        if (this.isArrayDeps) {
             return Dependency.arrayWay(this.definition);
         }
 
@@ -38,11 +43,11 @@ module.exports = class Dependency {
     }
 
     makeClass() {
-        if (this.isArray) {
+        if (this.isArrayDeps) {
             return Dependency.arrayWay(this.definition);
         }
 
-        if (this.isObject) {
+        if (this.isObjectDeps) {
             return Dependency.objectWay(this.definition);
         }
 
