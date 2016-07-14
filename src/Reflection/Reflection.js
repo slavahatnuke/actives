@@ -96,4 +96,8 @@ module.exports = class Reflection {
         }
     }
 
+    static construct(_class, args) {
+        
+    }
+
 }
