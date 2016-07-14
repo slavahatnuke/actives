@@ -38,7 +38,6 @@ describe('Box', () => {
             }
 
             up() {
-                // console.log('this', this);
                 this.counter++;
             }
 
@@ -105,11 +104,9 @@ describe('Box', () => {
         box.add('B', 2)
 
         box.add('sum', () => {
-            console.log('here');
             return 5 + 5;
         });
 
-        console.log(box.get('sum'));
         expect(box.get('sum')).equal(10)
     });
 

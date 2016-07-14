@@ -45,6 +45,40 @@ module.exports = class Reflection {
         return this.getNames(object).forEach((name) => delete object[name]);
     }
 
+    static keys(object) {
+        return Object.keys(object);
+    }
+
+    static defineName(context, name, onGet = null, onSet = null) {
+        var description = {};
+
+        if(onGet) {
+            description.get = () => onGet(name);
+        }
+
+        if(onSet) {
+            description.set = () => onSet(name);
+        }
+
+        Object.defineProperty(context, name, description);
+    }
+
+    static defineNames(context, names, onGet = null, onSet = null) {
+        names.forEach((name) => {
+            this.defineName(context, name, onGet, onSet);
+        });
+        return context;
+    }
+
+    static iteratorToArray(iterator) {
+        let result = [];
+        for (let item of iterator) {
+            result.push(item)
+        }
+
+        return result;
+    }
+
     static clone(object) {
         if (this.isArray(object)) {
             return object.slice(0);

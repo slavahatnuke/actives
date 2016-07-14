@@ -25,6 +25,10 @@ module.exports = class Box {
         return this.definitions.getResolved(name);
     }
 
+    keys() {
+        return this.definitions.keys();   
+    }
+    
     //@@ re-think, should it be public?
     create(name) {
         if (this.definitions.isDefinition(name)) {

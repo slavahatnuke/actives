@@ -1,7 +1,9 @@
 let Creator = require('./Creator');
+let Dependency = require('./Dependency');
 var Reflection = require('../../Reflection/Reflection');
 
 module.exports = class ClassCreator extends Creator {
+
     constructor(definition) {
         super();
         this.definition = definition;
@@ -9,11 +11,7 @@ module.exports = class ClassCreator extends Creator {
     }
 
     getCreator(box) {
-        let dependencies = this.createDependencies(box);
-        return this.createBuilder(dependencies);
-    }
-
-    createBuilder(dependencies) {
+        let dependencies = Dependency.create(this.definition)(box);
 
         let _class = this._class;
         let _a = dependencies;
@@ -28,30 +26,6 @@ module.exports = class ClassCreator extends Creator {
             //@@ improve with reflect
             return eval('new _class(' + a + ')');
         };
-        //
-        // if (Reflection.isClass(definition.getDefinition())) {
-        //
-        //
-        // } else if (Reflection.isFunction(definition.getDefinition())) {
-        //     let it = definition.getDefinition();
-        //
-        //     let creator = function () {
-        //         return it.apply(this, dependencies);
-        //     };
-        //
-        //     creator.prototype = it.prototype;
-        //
-        //     return creator;
-        // }
-    }
 
-    createDependencies(box) {
-        let dependencies = this.definition.getDependencies();
-
-        if (Reflection.isArray(dependencies)) {
-            return dependencies.map((name) => box.get(name));
-        } else {
-            throw "TBD"
-        }
     }
 };

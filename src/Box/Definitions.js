@@ -1,4 +1,5 @@
 var Definition = require('./Definition');
+var Reflection = require('../Reflection/Reflection');
 
 module.exports = class Definitions {
     constructor() {
@@ -56,6 +57,10 @@ module.exports = class Definitions {
         } else {
             this.values.set(name, value);
         }
+    }
+
+    keys() {
+        return Reflection.iteratorToArray(this.values.keys()).concat(Reflection.iteratorToArray(this.definitions.keys()));
     }
 
 };

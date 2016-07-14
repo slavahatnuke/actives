@@ -1,5 +1,5 @@
 let Creator = require('./Creator');
-var Reflection = require('../../Reflection/Reflection');
+let Dependency = require('./Dependency');
 
 module.exports = class FunctionCreator extends Creator {
     constructor(definition) {
@@ -9,11 +9,8 @@ module.exports = class FunctionCreator extends Creator {
     }
 
     getCreator(box) {
-        let dependencies = this.createDependencies(box);
-        return this.createBuilder(dependencies);
-    }
+        let dependencies = Dependency.create(this.definition)(box);
 
-    createBuilder(dependencies) {
         let it = this._func;
 
         let creator = function () {
@@ -25,13 +22,4 @@ module.exports = class FunctionCreator extends Creator {
         return creator;
     }
 
-    createDependencies(box) {
-        let dependencies = this.definition.getDependencies();
-
-        if (Reflection.isArray(dependencies)) {
-            return dependencies.map((name) => box.get(name));
-        } else {
-            throw "TBD"
-        }
-    }
 };

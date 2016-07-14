@@ -28,7 +28,7 @@ module.exports = class Definition {
     }
 
     getDependencies() {
-        return this.dependencies || [];
+        return this.dependencies;
     }
 
     getDefinition() {
