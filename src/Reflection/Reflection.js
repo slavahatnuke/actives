@@ -10,8 +10,7 @@ module.exports = class Reflection {
     }
 
     static isArray(object) {
-        /// @@ recheck
-        return Object.prototype.toString.call(object) === '[object Array]';
+        return Array.isArray(object);
     }
 
     static isObject(object) {
@@ -19,7 +18,7 @@ module.exports = class Reflection {
     }
 
     static isClass(object) {
-        return typeof value === 'function' && /^\s*class\s+/.test(value.toString());
+        return this.isFunction(object) && /^\s*class\s+/.test(object.toString());
     }
 
     static isFunction(object) {
@@ -47,11 +46,20 @@ module.exports = class Reflection {
     }
 
     static clone(object) {
-        var _clone = function () {
-        };
+        if (this.isArray(object)) {
+            return object.slice(0);
+        } else if (this.isFunction(object)) {
+            return object;
+        } else if (this.isObject(object)) {
+            var _clone = function () {
+                return this;
+            };
 
-        _clone.prototype = object;
-        return new _clone;
+            _clone.prototype = object;
+            return new _clone();
+        } else {
+            return object;
+        }
     }
 
 }

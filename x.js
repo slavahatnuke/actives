@@ -1,3 +1,4 @@
+var Reflection = require('./src/Reflection/Reflection');
 var Decorator = require('./src/Reflection/Decorator');
 
 class Counter {
@@ -28,3 +29,6 @@ console.log(wrapper instanceof Counter);
 
 wrapper.up();
 console.log(wrapper.counter);
+
+
+var a = [1,2,3];
