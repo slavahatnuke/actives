@@ -100,14 +100,23 @@ describe('Box', () => {
 
         let box = actives.Box.create();
 
-        box.add('A', 1)
-        box.add('B', 2)
-
         box.add('sum', () => {
             return 5 + 5;
         });
 
         expect(box.get('sum')).equal(10)
+    });
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        box.add('A', 1)
+        box.add('B', 2)
+
+        box.add('sum', ({A, B}) => {
+            return A + B;
+        });
+        expect(box.get('sum')).equal(3)
     });
 
 });

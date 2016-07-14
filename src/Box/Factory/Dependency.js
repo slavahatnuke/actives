@@ -1,18 +1,5 @@
 let Reflection = require('../../Reflection/Reflection');
 
-let arrayWay = (definition) => (box) => definition.getDependencies().map((name) => box.get(name));
-
-let objectWay = (definition) => (box) => {
-    var dependencies = definition.getDependencies() || {};
-    let names = box.keys().concat(Reflection.keys(dependencies));
-
-    names = [...new Set(names)];
-    let context = Reflection.defineNames({}, names, (name) => box.get(name));
-
-    // @@ think maybe need to save context to the definition to speedup
-    return [context];
-};
-
 module.exports = class Dependency {
     constructor(definition) {
         this.definition = definition;
@@ -27,52 +14,60 @@ module.exports = class Dependency {
     }
 
     create() {
-        if(this.isFunction) {
+        if (this.isFunction) {
             return this.makeFunction();
         }
 
-        if(this.isClass) {
+        if (this.isClass) {
             return this.makeClass();
-        }
-    }
-
-    makeFunction() {
-
-    }
-
-    makeClass() {
-
-    }
-
-    static create(definition) {
-        let isClass = Reflection.isClass(definition.getDefinition());
-        let isFunction = !isClass && Reflection.isFunction(definition.getDefinition());
-
-        let hasDependencies = !!definition.getDependencies();
-
-        let isArray = Reflection.isArray(definition.getDependencies());
-        let isObject = !isArray && Reflection.isPureObject(definition.getDependencies());
-
-        if (isFunction) {
-            if (!hasDependencies || isObject) {
-                return objectWay(definition);
-            }
-
-            if (isArray) {
-                return arrayWay(definition);
-            }
-        }
-
-        if (isClass) {
-            if (isArray) {
-                return arrayWay(definition);
-            }
-
-            if (isObject) {
-                return objectWay(definition);
-            }
         }
 
         return () => [];
+    }
+
+    makeFunction() {
+        if (!this.hasDependencies || this.isObject) {
+            return Dependency.objectWay(this.definition);
+        }
+
+        if (this.isArray) {
+            return Dependency.arrayWay(this.definition);
+        }
+
+        return () => [];
+    }
+
+    makeClass() {
+        if (this.isArray) {
+            return Dependency.arrayWay(this.definition);
+        }
+
+        if (this.isObject) {
+            return Dependency.objectWay(this.definition);
+        }
+
+        return () => [];
+    }
+
+
+    static arrayWay(definition) {
+        return (box) => definition.getDependencies().map((name) => box.get(name));
+    }
+
+    static objectWay(definition) {
+        return (box) => {
+            var dependencies = definition.getDependencies() || {};
+            let names = box.keys().concat(Reflection.keys(dependencies));
+
+            names = [...new Set(names)];
+            let context = Reflection.defineNames({}, names, (name) => box.get(name));
+
+            // @@ think maybe need to save context to the definition to speedup
+            return [context];
+        }
+    }
+
+    static create(definition) {
+        return new Dependency(definition).create();
     }
 }
