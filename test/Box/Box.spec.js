@@ -96,4 +96,21 @@ describe('Box', () => {
         expect(counter).equal(service.counter);
         expect(counter.counter).equal(service.counter.counter);
     });
+
+    it('A', () => {
+
+        let box = actives.Box.create();
+
+        box.add('A', 1)
+        box.add('B', 2)
+
+        box.add('sum', () => {
+            console.log('here');
+            return 5 + 5;
+        });
+
+        console.log(box.get('sum'));
+        expect(box.get('sum')).equal(10)
+    });
+
 });

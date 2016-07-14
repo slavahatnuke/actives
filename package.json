@@ -6,6 +6,8 @@
   "scripts": {
     "test": "mocha --recursive",
     "test.watch": "mocha --watch --recursive",
+    "test.x": "mocha --recursive test/x.spec.js",
+    "test.x.watch": "mocha --watch test/x.spec.js",
     "cover": "node_modules/isparta/bin/isparta cover --report html node_modules/mocha/bin/_mocha -- --recursive",
     "cover.watch": "nodemon -x 'npm run cover'"
   },

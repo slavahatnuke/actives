@@ -1,55 +1,21 @@
 let Reflection = require('../Reflection/Reflection');
 
+let Creator = require('./Factory/Creator');
+let ClassCreator = require('./Factory/ClassCreator');
+let FunctionCreator = require('./Factory/FunctionCreator');
+
 module.exports = class Factory {
-    constructor() {
-
+    create(box, definition) {
+        return Factory.getCreator(definition).getCreator(box)()
     }
 
-    create(box, definitions, name) {
-        let definition = definitions.get(name);
-        let dependencies = this.createDependencies(box, definition);
-        let creator = this.getCreator(definition, dependencies);
-        return creator();
-    }
-
-    getCreator(definition, dependencies) {
-
+    static getCreator(definition) {
         if (Reflection.isClass(definition.getDefinition())) {
-
-            let _class = definition.getDefinition();
-            let _a = dependencies;
-
-            let a = dependencies
-                .map(function (value, idx) {
-                    return '_a[' + idx + ']';
-                })
-                .join(', ');
-
-            return function () {
-                //@@ improve with reflect
-                return eval('new _class(' + a + ')');
-            };
-
+            return new ClassCreator(definition);
         } else if (Reflection.isFunction(definition.getDefinition())) {
-            let it = definition.getDefinition();
-
-            let creator = function () {
-                return it.apply(this, dependencies);
-            };
-
-            creator.prototype = it.prototype;
-
-            return creator;
-        }
-    }
-
-    createDependencies(box, definition) {
-        let dependencies = definition.getDependencies();
-
-        if (Reflection.isArray(dependencies)) {
-            return dependencies.map((name) => box.get(name));
+            return new FunctionCreator(definition);
         } else {
-            throw "TBD"
+            return new Creator(definition);
         }
     }
 }

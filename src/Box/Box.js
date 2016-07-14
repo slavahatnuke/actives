@@ -2,8 +2,6 @@ let Definition = require('./Definition');
 let Definitions = require('./Definitions');
 let Factory = require('./Factory');
 
-new Definitions();
-
 module.exports = class Box {
     constructor() {
         this.definitions = new Definitions();
@@ -16,17 +14,24 @@ module.exports = class Box {
     }
 
     get(name) {
-        if(!this.definitions.isResolved(name)) {
+        if(name === 'container') {
+            return this;
+        }
+
+        if (!this.definitions.isResolved(name)) {
             this.definitions.resolve(name, this.create(name));
         }
 
         return this.definitions.getResolved(name);
     }
 
+    //@@ re-think, should it be public?
     create(name) {
-        return this.factory.create(this, this.definitions, name);
+        if (this.definitions.isDefinition(name)) {
+            return this.factory.create(this, this.definitions.get(name));
+        }
     }
-    
+
     static create() {
         return new Box();
     }
