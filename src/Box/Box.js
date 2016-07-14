@@ -27,7 +27,7 @@ module.exports = class Box {
         return this.factory.create(this, this.definitions, name);
     }
     
-    static create(data) {
-        return new Box(data);
+    static create() {
+        return new Box();
     }
 }
