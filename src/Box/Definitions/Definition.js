@@ -29,7 +29,7 @@ module.exports = class Definition {
 
         if (this.isConnected()) {
             if (Reflection.isPureObject(value)) {
-                this.value = new ObjectObserver(value, (payload) => this.observer.notify(payload));
+                this.value = ObjectObserver(value, (payload) => this.observer.notify(payload));
             } else if (Reflection.isFunction(value)) {
                 this.value = FunctionObserver(value, {}, (payload) => this.observer.notify(payload))
             } else {
