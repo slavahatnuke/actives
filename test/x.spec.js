@@ -26,35 +26,29 @@ describe('x.js', () => {
         box.connect('Presentation', 'Counter')
             .state(({Counter}) => {
                 return {
-                    counter: Counter.get(counter)
+                    counter: Counter.get()
+                };
+            })
+            .actions(({Counter}) => {
+                return {
+                    onUp: () => Counter.up()
                 };
             });
+        //
+        // let presentation;
+        // let callCounter = 0;
+        //
+        // box.connect('MyView', 'Presentation')
+        //     .state(({Presentation}) => {
+        //         callCounter++;
+        //         presentation = Presentation
+        //     });
+        //
+        // console.log(box.get('MyView'));
+        // console.log('presentation 1', presentation, callCounter);
+        // box.get('Presentation').onUp()
+        // console.log('presentation 2', presentation);
 
-        var testPresentation = null;
-        box.connect('MyPresentation', 'Presentation')
-            .state(({Presentation}) => {
-                // ReactiveComponent.render(Presentation);
-                testPresentation = {
-                    Presentation
-                };
-            });
-
-        var counter = box.get('Counter');
-        counter.up();
-
-        expect(testPresentation).deep.equal({
-            Presentation: {
-                counter: 1
-            }
-        });
-
-        counter.up();
-
-        expect(testPresentation).deep.equal({
-            Presentation: {
-                counter: 2
-            }
-        });
 
     });
 });

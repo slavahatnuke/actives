@@ -7,6 +7,7 @@ module.exports = class Connection {
 
         this.observer = undefined;
         this.stateCreator = undefined;
+        this.actionsCreator = undefined;
         this.stateValue = undefined;
     }
 
@@ -19,11 +20,20 @@ module.exports = class Connection {
         return this;
     }
 
+    actions(creator) {
+        this.actionsCreator = creator;
+        return this;
+    }
+
     subscribe(observer) {
         this.observer = this.observer || new Observer();
         this.observer.subscribe(observer);
     }
 
+    hasState() {
+        return !!this.stateValue;
+    }
+    
     getState() {
         return this.stateValue || {};
     }

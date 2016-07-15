@@ -9,23 +9,25 @@ module.exports = class DefinitionConnection extends Connection {
     }
 
     notify(box, event) {
+
+        box.get(this.service); // needs for init
+
         this.resetState();
 
         if (this.stateCreator) {
-            this.applyState(this.stateCreator(this.getContext(box)));
+            var context = this.getContext(box);
+            this.applyState(this.stateCreator(context));
         }
 
         this.observer && this.observer.notify();
     }
 
     getContext(box) {
+
         if (!this.context) {
-
-            var map = {
+            this.context = box.context({
                 [this.service]: () => this.definition.getOriginValue()
-            };
-
-            this.context = box.context(map);
+            });
         }
 
         return this.context;
