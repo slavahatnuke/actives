@@ -1,4 +1,4 @@
-var Observer = require('../Actives/Observer');
+var Observer = require('../../Actives/Observer');
 let Reflection = require('../../Reflection/Reflection');
 
 module.exports = class Connection {

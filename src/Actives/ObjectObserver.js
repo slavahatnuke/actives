@@ -1,4 +1,4 @@
-var Reflection = require('./../../Reflection/Reflection');
+var Reflection = require('./../Reflection/Reflection');
 
 /// @@@ refactor
 module.exports = function (origin, observer = () => null) {

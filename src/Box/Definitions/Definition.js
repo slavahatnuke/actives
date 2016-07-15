@@ -1,6 +1,6 @@
 var Reflection = require('../../Reflection/Reflection');
-var Observer = require('../Actives/Observer');
-var ObjectObserver = require('../Actives/ObjectObserver');
+var Observer = require('../../Actives/Observer');
+var ObjectObserver = require('../../Actives/ObjectObserver');
 
 module.exports = class Definition {
     constructor(name, definition, dependencies) {
