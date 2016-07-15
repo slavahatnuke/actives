@@ -151,26 +151,22 @@ describe('Box', () => {
             }
         }
 
+        var value = 0;
         box.add('Value', 0);
         box.add('Counter', Counter);
 
         box.connect('Presentation', 'Counter')
-            .state(({Counter, self}) => {
-
-                self.add('Value', Counter.get());
-
-                return {
-                    counter: Counter.get()
-                };
+            .state(({Counter}) => {
+                value = Counter.get();
             });
 
         var counter = box.get('Counter');
         counter.up();
 
-        expect(box.get('Value')).equal(1)
+        expect(value).equal(1)
 
         counter.up();
-        expect(box.get('Value')).equal(2)
+        expect(value).equal(2)
     });
 
 });
