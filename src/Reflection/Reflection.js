@@ -52,11 +52,11 @@ module.exports = class Reflection {
     static defineName(context, name, onGet = null, onSet = null) {
         var description = {};
 
-        if(onGet) {
+        if (onGet) {
             description.get = () => onGet(name);
         }
 
-        if(onSet) {
+        if (onSet) {
             description.set = () => onSet(name);
         }
 
@@ -82,8 +82,6 @@ module.exports = class Reflection {
     static clone(object) {
         if (this.isArray(object)) {
             return object.slice(0);
-        } else if (this.isFunction(object)) {
-            return object;
         } else if (this.isObject(object)) {
             var _clone = function () {
                 return this;
