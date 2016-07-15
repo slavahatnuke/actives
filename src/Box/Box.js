@@ -62,7 +62,7 @@ module.exports = class Box {
         }
 
         if (!connection && this.connections.has(service)) {
-            connection = new ConnectionConnection(name, service);
+            connection = new ConnectionConnection(name);
             this.connections.get(service).subscribe((event) => connection.notify(this, event));
         }
 
