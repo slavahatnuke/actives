@@ -4,7 +4,9 @@ let Factory = require('./Factory/Factory');
 
 let Reflection = require('../Reflection/Reflection');
 let Connections = require('./Connections/Connections');
+
 let DefinitionConnection = require('./Connections/DefinitionConnection');
+let ConnectionConnection = require('./Connections/ConnectionConnection');
 
 module.exports = class Box {
     constructor() {
@@ -27,6 +29,10 @@ module.exports = class Box {
             this.definitions.resolve(name, this.create(name));
         }
 
+        if(this.connections.has(name)) {
+            return this.connections.get(name).getState();
+        }
+
         return this.definitions.getResolved(name);
     }
 
@@ -42,6 +48,7 @@ module.exports = class Box {
     }
 
     connect(name, service) {
+
         if (this.definitions.isDefinition(service)) {
             var definition = this.definitions.get(service);
 
@@ -50,10 +57,17 @@ module.exports = class Box {
 
             this.definitions.connect(service, (event) => connection.notify(this, event));
             return connection;
-        } else {
-            throw new Error('Unexpected connection, no definition');
         }
 
+        if (this.connections.has(service)) {
+            var connection = new ConnectionConnection(name, service);
+            this.connections.add(connection);
+
+            this.connections.get(service).subscribe((event) => (event) => connection.notify(this, event));
+            return connection;
+        }
+
+        throw new Error('Unexpected connection, no definition or another connection');
     }
 
 

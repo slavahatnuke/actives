@@ -24,7 +24,7 @@ module.exports = class Definition {
     }
 
     resolve(value) {
-        this.originValue = value
+        this.originValue = value;
 
         if(this.isConnected()) {
             this.value = new ObjectObserver(value, (payload) => this.observer.notify(payload));
@@ -33,7 +33,6 @@ module.exports = class Definition {
         }
 
         this.resolved = true;
-
     }
 
     getOriginValue() {
@@ -54,12 +53,24 @@ module.exports = class Definition {
 
     connect(observer) {
         this.connected = true;
+        this.subscribe(observer);
+    }
+
+    subscribe(observer) {
         this.observer = this.observer || new Observer();
         this.observer.subscribe(observer);
     }
 
     isConnected() {
         return this.connected;
+    }
+
+    reset() {
+        // @@ need re-think
+    }
+    
+    destroy() {
+        // @@ need re-think
     }
 
     static create(name, definition, dependencies) {

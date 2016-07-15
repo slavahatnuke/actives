@@ -113,4 +113,8 @@ module.exports = class Reflection {
         return [...new Set(names)];
     }
 
+    static merge(target, ...args) {
+        return Object.assign.apply(Object, [target, ...args])
+    }
+
 }

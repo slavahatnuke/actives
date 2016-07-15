@@ -1,4 +1,4 @@
-var Connection = require('./DefinitionConnection');
+var Connection = require('./Connection');
 
 module.exports = class Connections {
     constructor() {
@@ -10,4 +10,13 @@ module.exports = class Connections {
             this.connections.set(connection.getName(), connection);
         }
     }
+
+    get(name) {
+        return this.connections.get(name);
+    }
+
+    has(name) {
+        return this.connections.has(name);
+    }
+
 }

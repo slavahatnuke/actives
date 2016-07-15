@@ -1,24 +1,25 @@
 let Connection = require('./Connection');
 
-module.exports = class DefinitionConnection extends Connection {
-    constructor(name, definition) {
+module.exports = class ConnectionConnection extends Connection {
+    constructor(name, service) {
         super(name);
-        this.service = definition.getName();
-        this.definition = definition;
+        this.service = service;
     }
 
     notify(box, event) {
+        console.log('here');
+
         this.resetState();
 
-        if (this.stateCreator) {
+        if(this.stateCreator) {
             var map = {
                 [this.service]: () => this.definition.getOriginValue()
             };
 
             /// @@ cache context
             let context = box.context(map);
-            var state = this.stateCreator(context);
-            this.applyState(state);
+            // @@@@ handle results
+            this.applyState(this.stateCreator(context));
         }
 
         this.observer && this.observer.notify();
