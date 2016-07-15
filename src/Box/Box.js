@@ -5,8 +5,7 @@ let Factory = require('./Factory/Factory');
 let Reflection = require('../Reflection/Reflection');
 let Connections = require('./Connections/Connections');
 
-let DefinitionConnection = require('./Connections/DefinitionConnection');
-let ConnectionConnection = require('./Connections/ConnectionConnection');
+let Connector = require('./Connections/Connector');
 
 module.exports = class Box {
     constructor() {
@@ -52,26 +51,13 @@ module.exports = class Box {
     }
 
     connect(name, service) {
-
-        let connection;
-
-        if (!connection && this.definitions.isDefinition(service)) {
-            var definition = this.definitions.get(service);
-            connection = new DefinitionConnection(name, definition);
-            definition.connect((event) => connection.notify(this, event));
-        }
-
-        if (!connection && this.connections.has(service)) {
-            connection = new ConnectionConnection(name);
-            this.connections.get(service).subscribe((event) => connection.notify(this, event));
-        }
-
-        if (!connection) {
-            throw new Error('Unexpected connection, no definition or another connection');
-        }
-
-        this.connections.add(connection);
-        return connection;
+        return Connector.connect({
+            name: name,
+            service: service,
+            box: this,
+            definitions: this.definitions,
+            connections: this.connections
+        });
     }
 
 

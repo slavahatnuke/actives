@@ -7,27 +7,32 @@ describe('x.js', () => {
     it('A', () => {
         let box = actives.Box.create();
 
-        box.add('value', 3);
-        box.add('sum', ({value}) => (data) => data + value);
+        class Counter {
+            constructor() {
+                this.counter = 0;
+            }
 
-        let stateCounter = 0;
+            get() {
+                return this.counter;
+            }
 
-        box.connect('sumView', 'sum')
-            .state(({sum}) => {
-                stateCounter++;
-                return {
-                    result: sum(5)
-                };
-            });
+            up() {
+                this.counter++;
+            }
+        }
 
-        expect(stateCounter).equal(0)
-        var sum = box.get('sum');
-        expect(stateCounter).equal(0)
+        box.add('counter1', Counter);
+        box.add('counter2', Counter);
+        //
+        // box.connect('complexView', ['counter1','counter2'])
+        //     .state(({counter1, counter2}) => {
+        //         return {
+        //             counter1,
+        //             counter2
+        //         };
+        //     });
 
-        sum(5);
-        expect(stateCounter).equal(1)
-        sum(5);
-        sum(5);
-        expect(stateCounter).equal(3)
+
+
     });
 });
