@@ -1,11 +1,15 @@
 let Definition = require('./Definitions/Definition');
 let Definitions = require('./Definitions/Definitions');
 let Factory = require('./Factory/Factory');
+
+let Reflection = require('../Reflection/Reflection');
+let Connections = require('./Connections/Connections');
 let Connection = require('./Connections/Connection');
 
 module.exports = class Box {
     constructor() {
         this.definitions = new Definitions();
+        this.connections = new Connections();
         this.factory = new Factory();
     }
 
@@ -15,7 +19,7 @@ module.exports = class Box {
     }
 
     get(name) {
-        if(name === 'container') {
+        if (name === 'self') {
             return this;
         }
 
@@ -27,9 +31,9 @@ module.exports = class Box {
     }
 
     keys() {
-        return this.definitions.keys();   
+        return this.definitions.keys();
     }
-    
+
     //@@ re-think, should it be public?
     create(name) {
         if (this.definitions.isDefinition(name)) {
@@ -38,7 +42,37 @@ module.exports = class Box {
     }
 
     connect(name, service) {
-        return new Connection(name, service);
+        if (this.definitions.isDefinition(service)) {
+            var definition = this.definitions.get(service);
+
+            // @@ simplify constructor
+            var connection = new Connection(name, service, definition);
+            this.connections.add(name, connection);
+
+            this.definitions.connect(service, (event) => connection.notify(this, event));
+            return connection;
+        } else {
+            throw new Error('Unexpected connection, no definition');
+        }
+
+    }
+
+
+
+    context(map = {}) {
+        map['self'] = () => this;
+        let names = this.keys().concat(Reflection.keys(map));
+        names = Reflection.uniqueArray(names);
+
+        return Reflection.defineNames({}, names, (name) => {
+            var _name = map[name] || name;
+
+            if(Reflection.isFunction(_name)) {
+                return _name(this);
+            }
+
+            return this.get(_name);
+        });
     }
 
     static create() {

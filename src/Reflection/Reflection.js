@@ -109,4 +109,8 @@ module.exports = class Reflection {
         };
     }
 
+    static uniqueArray(names) {
+        return [...new Set(names)];
+    }
+
 }

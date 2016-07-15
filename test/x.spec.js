@@ -19,17 +19,25 @@ describe('x.js', () => {
             }
         }
 
+        box.add('Value', 0);
         box.add('Counter', Counter);
 
         box.connect('Presentation', 'Counter')
-            .state(({Counter}) => {
-                console.log('here');
+            .state(({Counter, self}) => {
+
+                self.add('Value', Counter.get());
 
                 return {
                     counter: Counter.get()
                 };
             });
 
-        // expect(box.get('sum')).equal(4)
+        var counter = box.get('Counter');
+        counter.up();
+
+        expect(box.get('Value')).equal(1)
+
+        counter.up();
+        expect(box.get('Value')).equal(2)
     });
 });

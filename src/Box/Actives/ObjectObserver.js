@@ -1,5 +1,6 @@
-var Reflection = require('./Reflection');
+var Reflection = require('./../../Reflection/Reflection');
 
+/// @@@ refactor
 module.exports = function (origin, observer = () => null) {
     let wrapper = Reflection.clone(origin);
     Reflection.getNames(origin).forEach((name) => {

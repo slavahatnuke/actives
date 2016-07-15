@@ -1,4 +1,6 @@
 var Reflection = require('../../Reflection/Reflection');
+var Observer = require('../Actives/Observer');
+var ObjectObserver = require('../Actives/ObjectObserver');
 
 module.exports = class Definition {
     constructor(name, definition, dependencies) {
@@ -8,6 +10,9 @@ module.exports = class Definition {
 
         this.resolved = false;
         this.value = undefined;
+        this.originValue = undefined;
+        this.observer = undefined;
+        this.connected = false;
     }
 
     getName() {
@@ -19,8 +24,20 @@ module.exports = class Definition {
     }
 
     resolve(value) {
-        this.value = value;
+        this.originValue = value
+
+        if(this.isConnected()) {
+            this.value = new ObjectObserver(value, (payload) => this.observer.notify(payload));
+        } else {
+            this.value = value;
+        }
+
         this.resolved = true;
+
+    }
+
+    getOriginValue() {
+        return this.originValue;
     }
 
     getResolved() {
@@ -33,6 +50,16 @@ module.exports = class Definition {
 
     getDefinition() {
         return this.definition;
+    }
+
+    connect(observer) {
+        this.connected = true;
+        this.observer = this.observer || new Observer();
+        this.observer.subscribe(observer);
+    }
+
+    isConnected() {
+        return this.connected;
     }
 
     static create(name, definition, dependencies) {

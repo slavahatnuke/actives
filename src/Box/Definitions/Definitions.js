@@ -63,4 +63,10 @@ module.exports = class Definitions {
         return Reflection.iteratorToArray(this.values.keys()).concat(Reflection.iteratorToArray(this.definitions.keys()));
     }
 
+    connect(name, observer = () => null) {
+        if (this.isDefinition(name)) {
+            this.get(name).connect(observer)
+        }
+    }
+
 };

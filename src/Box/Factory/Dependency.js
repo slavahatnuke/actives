@@ -62,10 +62,7 @@ module.exports = class Dependency {
     static objectWay(definition) {
         return (box) => {
             var dependencies = definition.getDependencies() || {};
-            let names = box.keys().concat(Reflection.keys(dependencies));
-
-            names = [...new Set(names)]; // unique fields
-            let context = Reflection.defineNames({}, names, (name) => box.get(dependencies[name] || name));
+            let context = box.context(dependencies);
 
             // @@ think maybe need to save context to the definition to speedup
             return [context];
