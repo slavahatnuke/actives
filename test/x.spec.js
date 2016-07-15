@@ -34,8 +34,6 @@ describe('x.js', () => {
         box.connect('MyPresentation', 'Presentation')
             .state(({Presentation}) => {
                 // ReactiveComponent.render(Presentation);
-
-                console.log('>>>> render view');
                 testPresentation = {
                     Presentation
                 };
@@ -43,9 +41,14 @@ describe('x.js', () => {
 
         var counter = box.get('Counter');
         counter.up();
-        counter.up();
 
-        console.log('myPresentation', testPresentation);
+        expect(testPresentation).deep.equal({
+            Presentation: {
+                counter: 1
+            }
+        });
+
+        counter.up();
 
         expect(testPresentation).deep.equal({
             Presentation: {

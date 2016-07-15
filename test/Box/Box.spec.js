@@ -212,4 +212,58 @@ describe('Box', () => {
             counterByValue: 2
         });
     });
+
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        class Counter {
+            constructor() {
+                this.counter = 0;
+            }
+
+            get() {
+                return this.counter;
+            }
+
+            up() {
+                this.counter++;
+            }
+        }
+
+        box.add('Counter', Counter);
+
+        box.connect('Presentation', 'Counter')
+            .state(({Counter}) => {
+                return {
+                    counter: Counter.get(counter)
+                };
+            });
+
+        var testPresentation = null;
+        box.connect('MyPresentation', 'Presentation')
+            .state(({Presentation}) => {
+                testPresentation = {
+                    Presentation
+                };
+            });
+
+        var counter = box.get('Counter');
+        counter.up();
+
+        expect(testPresentation).deep.equal({
+            Presentation: {
+                counter: 1
+            }
+        });
+
+        counter.up();
+
+        expect(testPresentation).deep.equal({
+            Presentation: {
+                counter: 2
+            }
+        });
+
+    });
 });

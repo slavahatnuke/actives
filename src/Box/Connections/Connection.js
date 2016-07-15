@@ -34,11 +34,9 @@ module.exports = class Connection {
 
     applyState(state) {
         this.stateValue = this.stateValue || {};
-
-        // console.log('ap state', state);
+        
         if (Reflection.isPureObject(state)) {
             Reflection.merge(this.stateValue, state);
-            console.log(this.stateValue);
         }
     }
 
