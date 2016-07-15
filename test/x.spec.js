@@ -43,19 +43,15 @@ describe('x.js', () => {
 
         var counter = box.get('Counter');
         counter.up();
+        counter.up();
 
-        expect(box.get('Presentation')).deep.equal({
-            counter: 1
+        console.log('myPresentation', testPresentation);
+
+        expect(testPresentation).deep.equal({
+            Presentation: {
+                counter: 2
+            }
         });
-        //
-        // console.log('myPresentation', testPresentation);
-        // // expect(value).equal(1)
-        //
-        // expect(testPresentation).deep.equal({
-        //     Presentation: {
-        //         counter: 1
-        //     }
-        // });
 
     });
 });

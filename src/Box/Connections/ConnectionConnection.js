@@ -7,18 +7,12 @@ module.exports = class ConnectionConnection extends Connection {
     }
 
     notify(box, event) {
-        console.log('here');
 
         this.resetState();
 
         if(this.stateCreator) {
-            var map = {
-                [this.service]: () => this.definition.getOriginValue()
-            };
-
             /// @@ cache context
-            let context = box.context(map);
-            // @@@@ handle results
+            let context = box.context();
             this.applyState(this.stateCreator(context));
         }
 

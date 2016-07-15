@@ -5,22 +5,29 @@ module.exports = class DefinitionConnection extends Connection {
         super(name);
         this.service = definition.getName();
         this.definition = definition;
+        this.context = undefined;
     }
 
     notify(box, event) {
         this.resetState();
 
         if (this.stateCreator) {
+            this.applyState(this.stateCreator(this.getContext(box)));
+        }
+
+        this.observer && this.observer.notify();
+    }
+
+    getContext(box) {
+        if (!this.context) {
+
             var map = {
                 [this.service]: () => this.definition.getOriginValue()
             };
 
-            /// @@ cache context
-            let context = box.context(map);
-            var state = this.stateCreator(context);
-            this.applyState(state);
+            this.context = box.context(map);
         }
 
-        this.observer && this.observer.notify();
+        return this.context;
     }
 }

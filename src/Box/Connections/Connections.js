@@ -1,4 +1,5 @@
 var Connection = require('./Connection');
+var Reflection = require('../../Reflection/Reflection');
 
 module.exports = class Connections {
     constructor() {
@@ -19,4 +20,7 @@ module.exports = class Connections {
         return this.connections.has(name);
     }
 
+    keys() {
+        return Reflection.iteratorToArray(this.connections.keys());
+    }
 }

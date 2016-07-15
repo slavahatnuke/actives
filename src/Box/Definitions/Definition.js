@@ -52,11 +52,11 @@ module.exports = class Definition {
     }
 
     connect(observer) {
-        this.connected = true;
         this.subscribe(observer);
     }
-
+    
     subscribe(observer) {
+        this.connected = true;
         this.observer = this.observer || new Observer();
         this.observer.subscribe(observer);
     }

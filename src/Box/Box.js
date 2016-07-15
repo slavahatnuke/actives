@@ -29,7 +29,7 @@ module.exports = class Box {
             this.definitions.resolve(name, this.create(name));
         }
 
-        if(this.connections.has(name)) {
+        if (this.connections.has(name)) {
             return this.connections.get(name).getState();
         }
 
@@ -37,7 +37,7 @@ module.exports = class Box {
     }
 
     keys() {
-        return this.definitions.keys();
+        return this.definitions.keys().concat(this.connections.keys());
     }
 
     //@@ re-think, should it be public?
@@ -49,25 +49,25 @@ module.exports = class Box {
 
     connect(name, service) {
 
-        if (this.definitions.isDefinition(service)) {
+        let connection;
+
+        if (!connection && this.definitions.isDefinition(service)) {
             var definition = this.definitions.get(service);
-
-            var connection = new DefinitionConnection(name, definition);
-            this.connections.add(connection);
-
-            this.definitions.connect(service, (event) => connection.notify(this, event));
-            return connection;
+            connection = new DefinitionConnection(name, definition);
+            definition.subscribe((event) => connection.notify(this, event));
         }
 
-        if (this.connections.has(service)) {
-            var connection = new ConnectionConnection(name, service);
-            this.connections.add(connection);
-
-            this.connections.get(service).subscribe((event) => (event) => connection.notify(this, event));
-            return connection;
+        if (!connection && this.connections.has(service)) {
+            connection = new ConnectionConnection(name, service);
+            this.connections.get(service).subscribe((event) => connection.notify(this, event));
         }
 
-        throw new Error('Unexpected connection, no definition or another connection');
+        if (!connection) {
+            throw new Error('Unexpected connection, no definition or another connection');
+        }
+
+        this.connections.add(connection);
+        return connection;
     }
 
 
