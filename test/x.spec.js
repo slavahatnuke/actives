@@ -27,43 +27,29 @@ describe('x.js', () => {
         box.connect('complexView', ['counter1','counter2'])
             .state(({counter1, counter2}) => {
                 return {
-                    counter1,
-                    counter2
+                    counter1: counter1.get(),
+                    counter2: counter2.get()
+                };
+            })
+            .actions(({counter1, counter2}) => {
+                return {
+                    onUp1: () => counter1.up(),
+                    onUp2: () => counter2.up()
                 };
             });
 
-        expect(box.get('complexView')).deep.equal({
-            counter1: {
-                counter: 0
-            },
-            counter2: {
-                counter: 0
-            }
-        })
+        expect(box.get('complexView').counter1).equal(0);
+        expect(box.get('complexView').counter2).equal(0);
 
-        box.get('counter1').up();
+        box.get('complexView').onUp1();
 
-        expect(box.get('complexView')).deep.equal({
-            counter1: {
-                counter: 1
-            },
-            counter2: {
-                counter: 0
-            }
-        })
+        expect(box.get('complexView').counter1).equal(1);
+        expect(box.get('complexView').counter2).equal(0);
 
-        box.get('counter1').up();
-        box.get('counter2').up();
+        box.get('complexView').onUp2();
 
-        expect(box.get('complexView')).deep.equal({
-            counter1: {
-                counter: 2
-            },
-            counter2: {
-                counter: 1
-            }
-        })
-
-
+        expect(box.get('complexView').counter1).equal(1);
+        expect(box.get('complexView').counter2).equal(1);
+        
     });
 });
