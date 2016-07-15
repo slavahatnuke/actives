@@ -1,6 +1,7 @@
-let Definition = require('./Definition');
-let Definitions = require('./Definitions');
-let Factory = require('./Factory');
+let Definition = require('./Definitions/Definition');
+let Definitions = require('./Definitions/Definitions');
+let Factory = require('./Factory/Factory');
+let Connection = require('./Connections/Connection');
 
 module.exports = class Box {
     constructor() {
@@ -34,6 +35,10 @@ module.exports = class Box {
         if (this.definitions.isDefinition(name)) {
             return this.factory.create(this, this.definitions.get(name));
         }
+    }
+
+    connect(name, service) {
+        return new Connection(name, service);
     }
 
     static create() {

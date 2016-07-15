@@ -1,6 +1,6 @@
-let Reflection = require('../Reflection/Reflection');
+let Reflection = require('../../Reflection/Reflection');
 
-let Creator = require('./Factory/Creator');
+let Creator = require('./Creator');
 
 module.exports = class Factory {
     create(box, definition) {

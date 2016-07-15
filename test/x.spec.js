@@ -5,15 +5,31 @@ describe('x.js', () => {
     it('A', () => {
         let box = require('./actives').Box.create();
 
-        box.add('A', 1)
-        box.add('B', 2)
-        box.add('C', 3)
+        class Counter {
+            constructor() {
+                this.counter = 0;
+            }
 
-        box.add('sum', ({A, B}) => {
-            return A + B;
-        }, {
-            B: 'C'
-        });
-        expect(box.get('sum')).equal(4)
+            get() {
+                return this.counter;
+            }
+
+            up() {
+                this.counter++;
+            }
+        }
+
+        box.add('Counter', Counter);
+
+        box.connect('Presentation', 'Counter')
+            .state(({Counter}) => {
+                console.log('here');
+
+                return {
+                    counter: Counter.get()
+                };
+            });
+
+        // expect(box.get('sum')).equal(4)
     });
 });

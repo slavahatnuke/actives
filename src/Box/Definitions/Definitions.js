@@ -1,5 +1,5 @@
 var Definition = require('./Definition');
-var Reflection = require('../Reflection/Reflection');
+var Reflection = require('../../Reflection/Reflection');
 
 module.exports = class Definitions {
     constructor() {
