@@ -1,7 +1,6 @@
 let Reflection = require('./../Reflection/Reflection');
 let FunctionObserver = require('./FunctionObserver');
 
-/// @@@ review var
 module.exports = function (origin, observer = () => null) {
     let wrapper = Reflection.clone(origin);
 
