@@ -9,18 +9,25 @@ module.exports = class DefinitionConnection extends Connection {
     }
 
     notify(box, event) {
-        box.get(this.service); // needs for init
-        this.notifyIt(box);
+        if (event.type == 'CONNECTION_INIT') {
+            box.get(this.service);
+        }
+        
+        this.notifyIt(box, event);
     }
 
     getContext(box) {
 
         if (!this.context) {
             this.context = box.context({
-                [this.service]: () => this.definition.getOriginValue()
+                [this.service]: () => this.getOriginValue()
             });
         }
 
         return this.context;
+    }
+
+    getOriginValue() {
+        return this.definition.getOriginValue();
     }
 }

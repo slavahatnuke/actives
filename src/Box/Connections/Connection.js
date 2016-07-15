@@ -37,8 +37,8 @@ module.exports = class Connection {
         this.observer.subscribe(observer);
     }
 
-    notifyObservers() {
-        this.observer && this.observer.notify();
+    notifyObservers(box, event) {
+        this.observer && this.observer.notify(event);
     }
 
     hasState() {
@@ -62,16 +62,16 @@ module.exports = class Connection {
     }
 
     notify(box, event) {
-        this.notifyIt(box);
+        this.notifyIt(box, event);
     }
 
-    notifyIt(box) {
+    notifyIt(box, event) {
         this.resetState();
 
         this.callActionsCreator(box);
         this.callStateCreator(box);
 
-        this.notifyObservers();
+        this.notifyObservers(box, event);
     }
 
     callActionsCreator(box) {
@@ -89,6 +89,10 @@ module.exports = class Connection {
         if (this.stateCreator) {
             this.applyState(this.stateCreator(this.getContext(box)));
         }
+    }
+
+    getOriginValue() {
+        return this.getState();
     }
 
     getContext(box) {

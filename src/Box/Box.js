@@ -30,7 +30,11 @@ module.exports = class Box {
 
         if (this.connections.has(name)) {
             if(!this.connections.get(name).hasState()) {
-                this.connections.get(name).notify(this)
+                this.connections.get(name).notify(this, {
+                    type: 'CONNECTION_INIT',
+                    name: name,
+                    box: this
+                });
             }
 
             return this.connections.get(name).getState();
