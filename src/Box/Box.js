@@ -58,7 +58,7 @@ module.exports = class Box {
         if (!connection && this.definitions.isDefinition(service)) {
             var definition = this.definitions.get(service);
             connection = new DefinitionConnection(name, definition);
-            definition.subscribe((event) => connection.notify(this, event));
+            definition.connect((event) => connection.notify(this, event));
         }
 
         if (!connection && this.connections.has(service)) {

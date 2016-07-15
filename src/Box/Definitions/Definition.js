@@ -1,6 +1,7 @@
-var Reflection = require('../../Reflection/Reflection');
-var Observer = require('../../Actives/Observer');
-var ObjectObserver = require('../../Actives/ObjectObserver');
+let Reflection = require('../../Reflection/Reflection');
+let Observer = require('../../Actives/Observer');
+let ObjectObserver = require('../../Actives/ObjectObserver');
+let FunctionObserver = require('../../Actives/FunctionObserver');
 
 module.exports = class Definition {
     constructor(name, definition, dependencies) {
@@ -26,8 +27,14 @@ module.exports = class Definition {
     resolve(value) {
         this.originValue = value;
 
-        if(this.isConnected()) {
-            this.value = new ObjectObserver(value, (payload) => this.observer.notify(payload));
+        if (this.isConnected()) {
+            if (Reflection.isPureObject(value)) {
+                this.value = new ObjectObserver(value, (payload) => this.observer.notify(payload));
+            } else if (Reflection.isFunction(value)) {
+                this.value = FunctionObserver(value, {}, (payload) => this.observer.notify(payload))
+            } else {
+                this.value = value;
+            }
         } else {
             this.value = value;
         }
@@ -54,7 +61,7 @@ module.exports = class Definition {
     connect(observer) {
         this.subscribe(observer);
     }
-    
+
     subscribe(observer) {
         this.connected = true;
         this.observer = this.observer || new Observer();
@@ -68,7 +75,7 @@ module.exports = class Definition {
     reset() {
         // @@ need re-think
     }
-    
+
     destroy() {
         // @@ need re-think
     }

@@ -1,5 +1,5 @@
-var Connection = require('./Connection');
-var Reflection = require('../../Reflection/Reflection');
+let Connection = require('./Connection');
+let Reflection = require('../../Reflection/Reflection');
 
 module.exports = class Connections {
     constructor() {

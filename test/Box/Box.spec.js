@@ -354,4 +354,183 @@ describe('Box', () => {
 
 
     });
+
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        class Counter {
+            constructor() {
+                this.counter = 0;
+            }
+
+            get() {
+                return this.counter;
+            }
+
+            up() {
+                this.counter++;
+            }
+        }
+
+        box.add('Counter', Counter);
+
+        box.connect('Presentation', 'Counter')
+            .state(({Counter}) => {
+                return {
+                    counter: Counter.get()
+                };
+            })
+            .actions(({Counter}) => {
+                return {
+                    onUp: () => Counter.up()
+                };
+            });
+
+        expect(box.get('Presentation').counter).equal(0);
+        box.get('Presentation').onUp();
+        expect(box.get('Presentation').counter).equal(1);
+        box.get('Presentation').onUp();
+        expect(box.get('Presentation').counter).equal(2);
+
+    });
+
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        class Counter {
+            constructor() {
+                this.counter = 0;
+            }
+
+            get() {
+                return this.counter;
+            }
+
+            up() {
+                this.counter++;
+            }
+        }
+
+        box.add('Counter', Counter);
+
+        box.connect('Presentation', 'Counter')
+            .state(({Counter}) => {
+                return {
+                    counter: Counter.get()
+                };
+            })
+            .actions(({Counter}) => {
+                return {
+                    onUp: () => Counter.up()
+                };
+            });
+
+        let renderData = {};
+
+        box.add('Renderer', () => (data) => renderData = data)
+
+        box.connect('View', 'Presentation')
+            .state(({Presentation, Renderer}) => {
+                Renderer(Presentation)
+            });
+
+        expect(renderData.counter).equal(undefined);
+
+        box.get('View');
+        expect(renderData.counter).equal(0);
+        box.get('Presentation').onUp();
+        expect(renderData.counter).equal(1);
+
+        box.get('Counter').up();
+        expect(renderData.counter).equal(2);
+
+    });
+
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        let testData = {};
+        box.add('render', () => (data) => testData = data);
+        box.get('render')({hello: 'action'})
+
+        expect(testData).deep.equal({
+            hello: 'action'
+        })
+    });
+
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        let testData = 0;
+
+        box.add('value', 3);
+        box.add('sum', (value) => (data) => testData = data + value, ['value']);
+        let result = box.get('sum')(7)
+
+        expect(result).equal(10)
+        expect(testData).equal(10)
+    });
+
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        let testData = 0;
+
+        box.add('value', 3);
+        box.add('sum', ({value}) => (data) => testData = data + value);
+        let result = box.get('sum')(7)
+
+        expect(result).equal(10)
+        expect(testData).equal(10)
+    });
+
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        box.add('value', 3);
+        box.add('sum', ({value}) => (data) => data + value);
+
+        box.connect('sumView', 'sum')
+            .state(({sum}) => {
+                return {
+                    result: sum(5)
+                };
+            });
+
+        expect(box.get('sumView').result).equal(8)
+    });
+
+
+    it('A', () => {
+        let box = actives.Box.create();
+
+        box.add('value', 3);
+        box.add('sum', ({value}) => (data) => data + value);
+
+        let stateCounter = 0;
+
+        box.connect('sumView', 'sum')
+            .state(({sum}) => {
+                stateCounter++;
+                return {
+                    result: sum(5)
+                };
+            });
+
+        expect(stateCounter).equal(0)
+        var sum = box.get('sum');
+        expect(stateCounter).equal(0)
+
+        sum(5);
+        expect(stateCounter).equal(1)
+        sum(5);
+        sum(5);
+        expect(stateCounter).equal(3)
+    });
 });

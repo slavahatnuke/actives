@@ -1,4 +1,4 @@
-var Reflection = require('./../Reflection/Reflection');
+let Reflection = require('./../Reflection/Reflection');
 let FunctionObserver = require('./FunctionObserver');
 
 /// @@@ review var
