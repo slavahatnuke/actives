@@ -57,7 +57,7 @@ module.exports = class Reflection {
         }
 
         if (onSet) {
-            description.set = () => onSet(name);
+            description.set = (value) => onSet(name, value);
         }
 
         Object.defineProperty(context, name, description);
