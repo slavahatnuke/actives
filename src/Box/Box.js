@@ -4,7 +4,7 @@ let Factory = require('./Factory/Factory');
 
 let Reflection = require('../Reflection/Reflection');
 let Connections = require('./Connections/Connections');
-let Connection = require('./Connections/Connection');
+let DefinitionConnection = require('./Connections/DefinitionConnection');
 
 module.exports = class Box {
     constructor() {
@@ -45,9 +45,8 @@ module.exports = class Box {
         if (this.definitions.isDefinition(service)) {
             var definition = this.definitions.get(service);
 
-            // @@ simplify constructor
-            var connection = new Connection(name, service, definition);
-            this.connections.add(name, connection);
+            var connection = new DefinitionConnection(name, definition);
+            this.connections.add(connection);
 
             this.definitions.connect(service, (event) => connection.notify(this, event));
             return connection;
@@ -58,7 +57,6 @@ module.exports = class Box {
     }
 
 
-
     context(map = {}) {
         map['self'] = () => this;
         let names = this.keys().concat(Reflection.keys(map));
@@ -67,7 +65,7 @@ module.exports = class Box {
         return Reflection.defineNames({}, names, (name) => {
             var _name = map[name] || name;
 
-            if(Reflection.isFunction(_name)) {
+            if (Reflection.isFunction(_name)) {
                 return _name(this);
             }
 

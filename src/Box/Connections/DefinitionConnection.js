@@ -1,7 +1,7 @@
-module.exports = class Connection {
-    constructor(name, service, definition) {
+module.exports = class DefinitionConnection {
+    constructor(name, definition) {
         this.name = name;
-        this.service = service;
+        this.service = definition.getName();
         this.stateCreator = undefined;
         this.definition = definition;
     }
