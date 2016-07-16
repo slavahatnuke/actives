@@ -56,7 +56,13 @@ module.exports = class Dependency {
 
 
     static arrayWay(definition) {
-        return (box) => definition.getDependencies().map((name) => box.get(name));
+        return (box) => definition.getDependencies().map((name) => {
+            if(Reflection.isFunction(name)) {
+                return name(box.context());
+            }
+
+            return box.get(name)
+        });
     }
 
     static objectWay(definition) {

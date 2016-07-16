@@ -555,7 +555,7 @@ describe('Box', () => {
         box.add('counter1', Counter);
         box.add('counter2', Counter);
 
-        box.connect('complexView', ['counter1','counter2'])
+        box.connect('complexView', ['counter1', 'counter2'])
             .state(({counter1, counter2}) => {
                 return {
                     counter1,
@@ -619,7 +619,7 @@ describe('Box', () => {
         box.add('counter1', Counter);
         box.add('counter2', Counter);
 
-        box.connect('complexView', ['counter1','counter2'])
+        box.connect('complexView', ['counter1', 'counter2'])
             .state(({counter1, counter2}) => {
                 return {
                     counter1: counter1.get(),
@@ -661,7 +661,7 @@ describe('Box', () => {
         box.add('counter1', Counter);
         box.add('counter2', Counter);
 
-        box.connect('complexView', ['counter1','counter2'])
+        box.connect('complexView', ['counter1', 'counter2'])
             .state(({counter1, counter2}) => {
                 return {
                     counter1: counter1.get(),
@@ -721,4 +721,41 @@ describe('Box', () => {
         expect(app.get('no-name')).equal(undefined);
 
     });
+
+
+    it('A', () => {
+        class Counter {
+            constructor(counter = 0) {
+                this.counter = counter;
+            }
+
+            get() {
+                return this.counter;
+            }
+
+            up() {
+                this.counter++;
+            }
+        }
+        let box = actives.Box.create();
+        box.add('defaultValue', 10);
+        box.add('counter', Counter, [({defaultValue}) => defaultValue + 5]);
+
+        expect(box.get('counter/counter')).equal(15);
+    });
+
+    it('A', () => {
+        let box = actives.Box.create();
+        box.add('A', 10);
+        box.add('B', 20);
+        box.add('C', 30);
+
+        box.add('sum', ({A, B}) => A + B, {
+            A: 'B',
+            B: ({C}) => C + 100
+        });
+
+        expect(box.get('sum')).equal(150);
+    });
+
 });

@@ -5,35 +5,53 @@ var actives = require('./actives');
 describe('x.js', () => {
 
     it('A', () => {
-        let app = actives.Box.create();
+        let box = actives.Box.create();
+        box.add('A', 10);
+        box.add('B', 20);
+        box.add('C', 30);
 
+        box.add('sum', ({A, B}) => A + B, {
+            A: 'B',
+            B: ({C}) => C + 100
+        });
 
-        class Counter {
-            constructor() {
-                this.counter = 0;
-            }
-
-            get() {
-                return this.counter;
-            }
-
-            up() {
-                this.counter++;
-            }
-        }
-
-        let CounterBox = actives.Box.create();
-
-        CounterBox.add('counter', Counter);
-
-        app.add('CounterBox', CounterBox);
-
-        let counter = app.get('CounterBox/counter/counter');
-        console.log(counter);
-        // expect(counter.counter).equal(0);
-        // counter.up();
-        // expect(counter.counter).equal(1);
-
-
+        expect(box.get('sum')).equal(150);
     });
+    //
+    // it('A', () => {
+    //     class Counter {
+    //         constructor(counter = 0) {
+    //             this.counter = counter;
+    //         }
+    //
+    //         get() {
+    //             return this.counter;
+    //         }
+    //
+    //         up() {
+    //             this.counter++;
+    //         }
+    //     }
+    //
+    //     let app = actives.Box.create();
+    //
+    //     let creator = () => {
+    //         let CounterBox = actives.Box.create();
+    //         CounterBox.add('defaultValue', 10);
+    //         CounterBox.add('counter', Counter, ['defaultValue']);
+    //
+    //         return CounterBox;
+    //     }
+    //
+    //     app.add('CounterBox1', creator());
+    //     expect(app.get('CounterBox1/counter/counter')).equal(10);
+    //
+    //     app.add('CounterBox2', creator(), {
+    //         defaultValue: () => 500
+    //     });
+    //
+    //     expect(app.get('CounterBox2/counter/counter')).equal(500);
+    //
+    //
+    // });
 });

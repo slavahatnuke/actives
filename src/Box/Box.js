@@ -72,6 +72,7 @@ module.exports = class Box {
 
     context(map = {}) {
         map['self'] = () => this;
+        /// @@ think about cache for context without map
         let names = this.keys().concat(Reflection.keys(map));
         names = Reflection.uniqueArray(names);
 
@@ -79,7 +80,7 @@ module.exports = class Box {
             var _name = map[name] || name;
 
             if (Reflection.isFunction(_name)) {
-                return _name(this);
+                return _name(this.context());
             }
 
             return this.get(_name);
