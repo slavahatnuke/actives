@@ -5,7 +5,8 @@ var actives = require('./actives');
 describe('x.js', () => {
 
     it('A', () => {
-        let box = actives.Box.create();
+        let app = actives.Box.create();
+
 
         class Counter {
             constructor() {
@@ -21,35 +22,18 @@ describe('x.js', () => {
             }
         }
 
-        box.add('counter1', Counter);
-        box.add('counter2', Counter);
+        let CounterBox = actives.Box.create();
 
-        box.connect('complexView', ['counter1','counter2'])
-            .state(({counter1, counter2}) => {
-                return {
-                    counter1: counter1.get(),
-                    counter2: counter2.get()
-                };
-            })
-            .actions(({counter1, counter2}) => {
-                return {
-                    onUp1: () => counter1.up(),
-                    onUp2: () => counter2.up()
-                };
-            });
+        CounterBox.add('counter', Counter);
 
-        expect(box.get('complexView').counter1).equal(0);
-        expect(box.get('complexView').counter2).equal(0);
+        app.add('CounterBox', CounterBox);
 
-        box.get('complexView').onUp1();
+        let counter = app.get('CounterBox/counter/counter');
+        console.log(counter);
+        // expect(counter.counter).equal(0);
+        // counter.up();
+        // expect(counter.counter).equal(1);
 
-        expect(box.get('complexView').counter1).equal(1);
-        expect(box.get('complexView').counter2).equal(0);
 
-        box.get('complexView').onUp2();
-
-        expect(box.get('complexView').counter1).equal(1);
-        expect(box.get('complexView').counter2).equal(1);
-        
     });
 });

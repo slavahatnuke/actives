@@ -6,6 +6,7 @@ let Reflection = require('../Reflection/Reflection');
 let Connections = require('./Connections/Connections');
 
 let Connector = require('./Connections/Connector');
+let Accessor = require('./Accessor/Accessor');
 
 module.exports = class Box {
     constructor() {
@@ -22,6 +23,10 @@ module.exports = class Box {
     get(name) {
         if (name === 'self') {
             return this;
+        }
+
+        if(Accessor.isPath(name)) {
+            return Accessor.path(name)(this);
         }
 
         if (!this.definitions.isResolved(name)) {

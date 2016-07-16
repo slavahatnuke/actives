@@ -689,4 +689,36 @@ describe('Box', () => {
         expect(box.get('complexView').counter2).equal(1);
 
     });
+
+
+    it('A', () => {
+        let app = actives.Box.create();
+
+        class Counter {
+            constructor() {
+                this.counter = 0;
+            }
+
+            get() {
+                return this.counter;
+            }
+
+            up() {
+                this.counter++;
+            }
+        }
+
+        let CounterBox = actives.Box.create();
+
+        CounterBox.add('counter', Counter);
+
+        app.add('CounterBox', CounterBox);
+
+        expect(app.get('CounterBox')).equal(CounterBox);
+        expect(app.get('CounterBox/counter')).equal(CounterBox.get('counter'))
+        expect(app.get('CounterBox/counter/counter')).equal(0);
+        expect(app.get('CounterBox/counter/counter/abcd')).equal(undefined);
+        expect(app.get('no-name')).equal(undefined);
+
+    });
 });
