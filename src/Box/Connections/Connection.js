@@ -5,6 +5,10 @@ module.exports = class Connection {
     constructor(name) {
         this.name = name;
 
+        this.reset();
+    }
+
+    reset() {
         this.observer = undefined;
         this.stateCreator = undefined;
         this.stateValue = undefined;
@@ -99,9 +103,6 @@ module.exports = class Connection {
         return box.context();
     }
 
-    reset() {
-        // @@ need re-think
-    }
 
     destroy() {
         // @@ need re-think

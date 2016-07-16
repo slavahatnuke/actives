@@ -23,4 +23,10 @@ module.exports = class Connections {
     keys() {
         return Reflection.iteratorToArray(this.connections.keys());
     }
+
+    remove(name) {
+        if(this.has(name)) {
+            this.get(name).reset();
+        }
+    }
 }

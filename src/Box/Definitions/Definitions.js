@@ -15,6 +15,17 @@ module.exports = class Definitions {
         }
     }
 
+    remove(name) {
+        if(this.isValue(name))  {
+            this.values.delete(name)
+        }
+
+        if(this.isDefinition(name))  {
+            this.definitions.get(name).reset();
+            this.definitions.delete(name);
+        }
+    }
+
     has(name) {
         return this.isDefinition(name) || this.isValue(name);
     }

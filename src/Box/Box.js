@@ -16,6 +16,7 @@ module.exports = class Box {
     }
 
     add(name, definition, dependencies) {
+        this.remove(name);
         this.definitions.add(name, Definition.create(name, definition, dependencies));
 
         if (definition instanceof Box) {
@@ -55,6 +56,16 @@ module.exports = class Box {
         }
 
         return this.definitions.getResolved(name);
+    }
+
+    remove(name) {
+        if (this.definitions.has(name)) {
+            this.definitions.remove(name);
+        }
+
+        if(this.connections.has(name)) {
+            this.connections.remove(name);
+        }
     }
 
     keys() {

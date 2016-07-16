@@ -9,11 +9,7 @@ module.exports = class Definition {
         this.definition = definition;
         this.dependencies = dependencies;
 
-        this.resolved = false;
-        this.value = undefined;
-        this.originValue = undefined;
-        this.observer = undefined;
-        this.connected = false;
+        this.reset();
     }
 
     getName() {
@@ -73,11 +69,11 @@ module.exports = class Definition {
     }
 
     reset() {
-        // @@ need re-think
-    }
-
-    destroy() {
-        // @@ need re-think
+        this.resolved = false;
+        this.value = undefined;
+        this.originValue = undefined;
+        this.observer = undefined;
+        this.connected = false;
     }
 
     static create(name, definition, dependencies) {

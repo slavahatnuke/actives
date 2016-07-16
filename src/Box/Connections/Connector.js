@@ -47,6 +47,8 @@ module.exports = class Connector {
     }
 
     static connect({name, service, box, definitions, connections}) {
+        connections.remove(name);
+        
         let connection = this.createConnection({
             name,
             service,

@@ -783,7 +783,7 @@ describe('Box', () => {
 
             return CounterBox;
         }
-        // @@KEEP
+
         app.add('CounterBox1', creator());
         expect(app.get('CounterBox1/counter/counter')).equal(10);
 
@@ -795,5 +795,19 @@ describe('Box', () => {
 
         expect(app.get('CounterBox2/counter/counter')).equal(500);
         expect(app.get('CounterBox2/valueA')).equal(25);
+    });
+
+    it('remove && resets', () => {
+        let box = actives.Box.create();
+        box.add('name', 'xxx')
+        box.add('name', 'yyy')
+
+        box.add('fun', () => () => null);
+        box.add('fun', () => () => null);
+
+        box.connect('Connector', 'fun')
+            .state(() => {})
+        box.connect('Connector', 'fun')
+            .state(() => {})
     });
 });
