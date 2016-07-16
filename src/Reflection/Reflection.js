@@ -21,6 +21,10 @@ module.exports = class Reflection {
         return object instanceof Function;
     }
 
+    static isPromise(object) {
+        return object instanceof Promise || (this.isObject(object) && Reflection.isFunction(object.then) && Reflection.catch(object.then));
+    }
+
     static getNames(object) {
         return this.getPropertyNames(object).concat(this.getMethodNames(object));
     }

@@ -4,30 +4,54 @@ var actives = require('./test/actives');
 
 describe('x.js', () => {
 
-    it('A', () => {
-        let box = actives.Box.create();
-        box.add('counter', {
-            counter: 0,
-            up: function () {
-                this.counter++
-            },
-            get: function () {
+    it('A', (done) => {
+        class Counter {
+            constructor(counter = 0) {
+                this.counter = counter;
+            }
+
+            get() {
                 return this.counter;
             }
-        });
 
+            up() {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        this.counter++;
+                        resolve();
+                    }, 10);
+                });
+            }
+        }
+
+        let box = actives.Box.create();
+        box.add('counter', Counter);
+
+        let callCounter = 0;
         box.connect('view', 'counter')
             .state(({counter}) => {
+                callCounter++;
                 return {
-                    counter,
-                    count: counter.get()
+                    counter: counter.get()
                 };
             });
 
-        expect(box.get('view/counter/counter')).equal(0);
-        expect(box.get('view/counter/count')).equal(0);
+
+        expect(box.get('view/counter')).equal(0);
+        expect(callCounter).equal(1);
+
+
         box.get('counter').up();
-        expect(box.get('view/counter/counter')).equal(1);
-        expect(box.get('view/counter/count')).equal(1);
+
+        // async
+        expect(box.get('view/counter')).equal(0);
+        expect(callCounter).equal(2);
+
+
+        setTimeout(() => {
+            expect(box.get('view/counter')).equal(1);
+            expect(callCounter).equal(4);
+            done();
+        }, 20);
     });
 });
