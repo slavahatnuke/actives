@@ -102,10 +102,4 @@ module.exports = class Connection {
     getContext(box) {
         return box.context();
     }
-
-
-    destroy() {
-        // @@ need re-think
-    }
-
 }

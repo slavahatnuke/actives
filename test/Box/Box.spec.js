@@ -810,4 +810,42 @@ describe('Box', () => {
         box.connect('Connector', 'fun')
             .state(() => {})
     });
+
+
+    it('A', () => {
+        class Counter {
+            constructor(counter = 0) {
+                this.counter = counter;
+            }
+
+            get() {
+                return this.counter;
+            }
+
+            up() {
+                this.counter++;
+            }
+        }
+
+        let counterBox = actives.Box.create();
+        counterBox.add('Counter', Counter);
+
+        let app = actives.Box.create();
+        app.add('CounterBox', counterBox);
+
+        app.get('CounterBox')
+            .connect('CounterView', 'Counter')
+            .state(({Counter}) => {
+                return {
+                    counter: Counter.get()
+                };
+            });
+
+        expect(app.get('CounterBox/CounterView/counter')).equal(0);
+        app.get('CounterBox/Counter').up();
+        expect(app.get('CounterBox/CounterView/counter')).equal(1);
+        app.get('CounterBox/Counter').up();
+        expect(app.get('CounterBox/CounterView/counter')).equal(2);
+
+    });
 });
