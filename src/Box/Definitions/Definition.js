@@ -79,6 +79,10 @@ module.exports = class Definition {
     static create(name, definition, dependencies) {
         if (Reflection.isFunction(definition)) {
             return new Definition(name, definition, dependencies);
+        } else if(Reflection.isPureObject(definition)){
+            var _definition = new Definition(name, definition);
+            _definition.resolve(definition);
+            return _definition;
         } else {
             return definition;
         }
