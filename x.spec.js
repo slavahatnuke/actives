@@ -29,7 +29,7 @@ describe('x.js', () => {
 
             return CounterBox;
         }
-        // @@KEEP
+        
         app.add('CounterBox1', creator());
         expect(app.get('CounterBox1/counter/counter')).equal(10);
 
