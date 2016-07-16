@@ -1,8 +1,4 @@
 module.exports = class Reflection {
-    constructor() {
-
-    }
-
     static isPureObject(object) {
         return this.isObject(object)
             && !this.isFunction(object)
@@ -39,10 +35,6 @@ module.exports = class Reflection {
 
     static getPropertyNames(object) {
         return Object.keys(object);
-    }
-
-    static removeAllNames(object) {
-        return this.getNames(object).forEach((name) => delete object[name]);
     }
 
     static keys(object) {

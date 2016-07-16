@@ -13,6 +13,7 @@ module.exports = class Box {
         this.definitions = new Definitions();
         this.connections = new Connections();
         this.factory = new Factory();
+        this.contextValue = undefined;
     }
 
     add(name, definition, dependencies) {
@@ -63,7 +64,7 @@ module.exports = class Box {
             this.definitions.remove(name);
         }
 
-        if(this.connections.has(name)) {
+        if (this.connections.has(name)) {
             this.connections.remove(name);
         }
     }
@@ -90,14 +91,19 @@ module.exports = class Box {
     }
 
 
-    context(map = {}) {
-        map['self'] = () => this;
-        /// @@ think about cache for context without map
-        let names = this.keys().concat(Reflection.keys(map));
+    context(map = null) {
+        if (!map && this.contextValue) {
+            return this.contextValue;
+        }
+
+        let _map = map || {};
+        _map['self'] = () => this;
+
+        let names = this.keys().concat(Reflection.keys(_map));
         names = Reflection.uniqueArray(names);
 
-        return Reflection.defineNames({}, names, (name) => {
-            var _name = map[name] || name;
+        let context = Reflection.defineNames({}, names, (name) => {
+            var _name = _map[name] || name;
 
             if (Reflection.isFunction(_name)) {
                 return _name(this.context());
@@ -105,6 +111,12 @@ module.exports = class Box {
 
             return this.get(_name);
         });
+
+        if (!map) {
+            this.contextValue = context;
+        }
+
+        return context;
     }
 
     static create() {
