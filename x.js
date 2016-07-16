@@ -1,1 +1,0 @@
-// var actives = require('./src');
