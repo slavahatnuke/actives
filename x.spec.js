@@ -18,7 +18,7 @@ describe('x.js', () => {
                 return new Promise((resolve, reject) => {
                     setTimeout(() => {
                         this.counter++;
-                        resolve();
+                        reject();
                     }, 10);
                 });
             }

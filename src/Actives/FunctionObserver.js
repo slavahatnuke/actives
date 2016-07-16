@@ -34,6 +34,8 @@ module.exports = function (origin, context, observer = () => null) {
                         origin: origin,
                         context: context
                     });
+
+                    return result;
                 });
         }
         return result
