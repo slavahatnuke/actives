@@ -5,10 +5,6 @@ let ArrayConnection = require('./ArrayConnection');
 let Reflection = require('../../Reflection/Reflection');
 
 module.exports = class Connector {
-    constructor() {
-
-    }
-
     static createConnection({name, service, box, definitions, connections}) {
 
         let connection;
@@ -47,8 +43,8 @@ module.exports = class Connector {
     }
 
     static connect({name, service, box, definitions, connections}) {
-        connections.remove(name);
-        
+        box.remove(name);
+
         let connection = this.createConnection({
             name,
             service,
