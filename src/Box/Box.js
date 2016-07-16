@@ -17,6 +17,15 @@ module.exports = class Box {
 
     add(name, definition, dependencies) {
         this.definitions.add(name, Definition.create(name, definition, dependencies));
+
+        if (definition instanceof Box) {
+            Factory.addBox({
+                box: this,
+                child: definition,
+                dependencies: dependencies
+            });
+        }
+
         return this;
     }
 
@@ -25,7 +34,7 @@ module.exports = class Box {
             return this;
         }
 
-        if(Accessor.isPath(name)) {
+        if (Accessor.isPath(name)) {
             return Accessor.path(name)(this);
         }
 
@@ -34,7 +43,7 @@ module.exports = class Box {
         }
 
         if (this.connections.has(name)) {
-            if(!this.connections.get(name).hasState()) {
+            if (!this.connections.get(name).hasState()) {
                 this.connections.get(name).notify(this, {
                     type: 'CONNECTION_INIT',
                     name: name,
