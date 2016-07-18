@@ -44,16 +44,10 @@ module.exports = class Definition {
                 this.value = ObjectObserver(value, (payload) => this.observer.notify(payload));
             } else if (Reflection.isFunction(value)) {
                 this.value = FunctionObserver(value, {}, (payload) => this.observer.notify(payload))
-            } else {
-                this.value = value;
             }
         }
 
         this.resolved = true;
-    }
-
-    unresolve() {
-        this.resolved = false;
     }
 
     getOriginValue() {
