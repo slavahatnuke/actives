@@ -813,7 +813,7 @@ describe('Box', () => {
     });
 
 
-    it('A', () => {
+    it('A sub container and rested pathes', () => {
         class Counter {
             constructor(counter = 0) {
                 this.counter = counter;
