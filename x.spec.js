@@ -4,7 +4,7 @@ var actives = require('./test/actives');
 describe('x.js', () => {
 
 
-    it('A', () => {
+    it('connect with hash and deep acccess', () => {
         class Counter {
             constructor(counter = 0) {
                 this.counter = counter;
@@ -19,26 +19,41 @@ describe('x.js', () => {
             }
         }
 
-        let box = actives.Box.create();
-        box.add('Counter', Counter);
+        let counterModule = actives.Box.create();
+        counterModule.add('Counter', Counter);
+
+        let app = actives.Box.create();
+
+        app.add('counterModule', counterModule);
 
         let xCounter = null;
-        box.connect('counterView', {childCounter: 'Counter'})
+        app.connect('counterView', {childCounter: 'counterModule/Counter'})
             .model(({childCounter}) => {
                 xCounter = childCounter.get();
 
                 return {
                     counter: childCounter.get()
                 }
+            })
+            .actions(({childCounter}) => {
+                return {
+                    onUp: () => chilCounter.up()
+                };
             });
 
 
-        expect(box.counterView).deep.equal({counter: 0});
-
-
+        expect(app.counterView.counter).equal(0);
         expect(xCounter).equal(0)
-        box.Counter.up();
-        box.Counter.up();
+
+        counterModule.Counter.up();
+        counterModule.Counter.up();
         expect(xCounter).equal(2)
+        expect(app.counterView.counter).equal(2);
+
+        app.counterView.onUp();
+        expect(xCounter).equal(5)
+        expect(app.counterView.counter).equal(5);
+
     });
+
 });

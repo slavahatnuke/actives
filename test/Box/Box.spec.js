@@ -1094,6 +1094,7 @@ describe('Box', () => {
     });
 
 
+
     it('Connection hash', () => {
         class Counter {
             constructor(counter = 0) {
@@ -1113,23 +1114,31 @@ describe('Box', () => {
         box.add('Counter', Counter);
 
         let xCounter = null;
-        box.connect('counterView', {childCounter: 'Counter'})
-            .model(({childCounter}) => {
-                xCounter = childCounter.get();
+        box.connect('counterView', {myCounter: 'Counter'})
+            .model(({myCounter}) => {
+                xCounter = myCounter.get();
 
                 return {
-                    counter: childCounter.get()
+                    counter: myCounter.get()
+                }
+            })
+            .actions(({myCounter}) => {
+                console.log(myCounter);
+                return {
+                    onUp: () => myCounter.up()
                 }
             });
 
 
-        expect(box.counterView).deep.equal({counter: 0});
+        expect(box.counterView.counter).equal(0);
 
 
-        expect(xCounter).equal(0)
+        expect(xCounter).equal(0);
         box.Counter.up();
         box.Counter.up();
-        expect(xCounter).equal(2)
+        expect(xCounter).equal(2);
+
+        box.counterView.onUp();
+        expect(box.counterView.counter).equal(3);
     });
-
 });

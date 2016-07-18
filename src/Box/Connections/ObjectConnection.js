@@ -4,7 +4,8 @@ module.exports = class ObjectConnection extends Connection {
     constructor(name) {
         super(name);
         this.connections = undefined;
-        this.context = undefined;
+        this.stateContext = undefined;
+        this.actionsContext = undefined;
     }
 
     setConnections(connections) {
@@ -25,8 +26,8 @@ module.exports = class ObjectConnection extends Connection {
         this.notifyIt(box, event);
     }
 
-    getContext(box) {
-        if (!this.context) {
+    getStateContext(box) {
+        if (!this.stateContext) {
             var map = {};
 
             let define = (key, connection) => map[key] = () => connection.getOriginValue();
@@ -35,15 +36,32 @@ module.exports = class ObjectConnection extends Connection {
                 define(name, this.connections[name]);
             }
 
-            this.context = box.context(map);
+            this.stateContext = box.context(map);
         }
 
-        return this.context;
+        return this.stateContext;
+    }
+
+
+    getActionsContext(box) {
+        if (!this.actionsContext) {
+            var map = {};
+
+            let define = (key, connection) => map[key] = () => connection.getValue();
+
+            for (var name in this.connections) {
+                define(name, this.connections[name]);
+            }
+
+            this.actionsContext = box.context(map);
+        }
+
+        return this.actionsContext;
     }
 
     reset() {
         this.connections = undefined;
-        this.context = undefined;
+        this.stateContext = undefined;
         super.reset();
     }
 

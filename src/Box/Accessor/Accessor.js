@@ -6,7 +6,14 @@ module.exports = class Accessor {
     }
 
     static isPath(path, delimiter = '/') {
-        return !!(Reflection.isArray(path) || path.indexOf(delimiter) > 0);
+        return !!(Reflection.isArray(path) || (Reflection.isString(path) && path.indexOf(delimiter) > 0));
+    }
+
+    static toArray(path, delimiter = '/') {
+        if (this.isPath(path)) {
+            return Reflection.isArray(path) ? path : path.split(delimiter);
+        }
+        return [];
     }
 
     static create(name) {

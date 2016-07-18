@@ -16,7 +16,7 @@ module.exports = class DefinitionConnection extends Connection {
         this.notifyIt(box, event);
     }
 
-    getContext(box) {
+    getStateContext(box) {
 
         if (!this.context) {
             this.context = box.context({
@@ -26,6 +26,11 @@ module.exports = class DefinitionConnection extends Connection {
 
         return this.context;
     }
+
+    getValue() {
+        return this.definition.getValue();
+    }
+
 
     getOriginValue() {
         return this.definition.getOriginValue();

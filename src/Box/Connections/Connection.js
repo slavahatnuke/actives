@@ -84,7 +84,7 @@ module.exports = class Connection {
 
     callActionsCreator(box) {
         if (this.actionsCreator && !this.actionsCalled) {
-            var value = this.actionsCreator(box.context());
+            var value = this.actionsCreator(this.getActionsContext(box));
             this.actionsValue = value;
             this.actionsCalled = true;
             this.applyState(value);
@@ -93,9 +93,13 @@ module.exports = class Connection {
         }
     }
 
+    getActionsContext(box) {
+        return box.context();
+    }
+
     callStateCreator(box) {
         if (this.stateCreator) {
-            this.applyState(this.stateCreator(this.getContext(box)));
+            this.applyState(this.stateCreator(this.getStateContext(box)));
         }
     }
 
@@ -103,7 +107,11 @@ module.exports = class Connection {
         return this.getState();
     }
 
-    getContext(box) {
+    getValue() {
+        return this.getOriginValue();
+    }
+
+    getStateContext(box) {
         return box.context();
     }
 }

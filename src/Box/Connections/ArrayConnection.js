@@ -23,7 +23,7 @@ module.exports = class ArrayConnection extends Connection {
         this.notifyIt(box, event);
     }
 
-    getContext(box) {
+    getStateContext(box) {
 
         if (!this.context) {
             var map = {};

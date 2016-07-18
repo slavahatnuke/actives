@@ -27,6 +27,10 @@ module.exports = class Definition {
         return this.name;
     }
 
+    getValue() {
+        return this.value;
+    }
+
     isResolved() {
         return this.resolved;
     }

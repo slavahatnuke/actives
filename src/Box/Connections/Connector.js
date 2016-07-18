@@ -5,6 +5,7 @@ let ObjectConnection = require('./ObjectConnection');
 
 let Reflection = require('../../Reflection/Reflection');
 let BoxReflection = require('../../Box/Reflection/BoxReflection');
+let Accessor = require('../Accessor/Accessor');
 
 module.exports = class Connector {
     static createConnection({name, service, box}) {
@@ -64,6 +65,27 @@ module.exports = class Connector {
             connections.get(service).subscribe((event) => connection.notify(box, event));
         }
 
+
+        if (!connection && Accessor.isPath(service)) {
+            let _path = Accessor.toArray(service);
+            let _service = _path.pop();
+
+            let _box = Accessor.path(_path)(box);
+            if (BoxReflection.isBox(_box)) {
+                connection = this.createConnection({
+                    name: name,
+                    service: _service,
+                    box: _box
+                });
+            } else {
+                throw new Error('Unexpected path to connected service: ' + service);
+            }
+        }
+
+        if (!connection) {
+            throw new Error('Unexpected connection, no definition or another connection');
+        }
+
         return connection;
     }
 
@@ -77,10 +99,6 @@ module.exports = class Connector {
             service,
             box
         });
-
-        if (!connection) {
-            throw new Error('Unexpected connection, no definition or another connection');
-        }
 
         connections.add(connection);
 

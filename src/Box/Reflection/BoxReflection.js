@@ -1,6 +1,5 @@
 let Reflection = require('../../Reflection/Reflection');
 var Definition = require('../Definitions/Definition');
-
 module.exports = class BoxReflection {
 
     static getDefinitions(box) {
@@ -31,5 +30,9 @@ module.exports = class BoxReflection {
             Reflection.defineName(box, name, (name) => box.get(name), (name, value) => box.add(name, value));
             box._names.set(name, name);
         }
+    }
+
+    static isBox(box) {
+        return box instanceof require('../Box');
     }
 }
