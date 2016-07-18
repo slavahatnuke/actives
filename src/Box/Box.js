@@ -25,20 +25,23 @@ module.exports = class Box {
 
     add(name, definition, dependencies) {
         this.remove(name);
-        this._definitions.add(name, Definition.create(name, definition, dependencies));
 
         if (definition instanceof Box) {
             BoxReflection.addBox({
                 box: this,
+                name: name,
                 child: definition,
                 dependencies: dependencies
             });
+        } else {
+            this._definitions.add(name, Definition.create(name, definition, dependencies));
         }
 
         BoxReflection.addName({
             box: this,
             name
         });
+        
         return this;
     }
 

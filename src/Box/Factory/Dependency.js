@@ -18,6 +18,10 @@ module.exports = class Dependency {
         return !this.isClass() && Reflection.isFunction(this.definition.getDefinition());
     }
 
+    isBox() {
+        return this.definition.getMeta().box;
+    }
+
     create() {
         if (this.isClass()) {
             return this.makeClass();
@@ -25,6 +29,19 @@ module.exports = class Dependency {
 
         if (this.isFunction()) {
             return this.makeFunction();
+        }
+
+        if (this.isBox()) {
+            return this.makeBox();
+        }
+
+        return () => [];
+    }
+
+
+    makeBox() {
+        if (this.isObjectDeps) {
+            return Dependency.objectBoxWay(this.definition);
         }
 
         return () => [];
@@ -57,7 +74,7 @@ module.exports = class Dependency {
 
     static arrayWay(definition) {
         return (box) => definition.getDependencies().map((name) => {
-            if(Reflection.isFunction(name)) {
+            if (Reflection.isFunction(name)) {
                 return name(box.context());
             }
 
@@ -68,10 +85,27 @@ module.exports = class Dependency {
     static objectWay(definition) {
         return (box) => {
             var dependencies = definition.getDependencies() || {};
-            let context = box.context(dependencies);
-
             // @@ think maybe need to save context to the definition to speedup
-            return [context];
+            return [box.context(dependencies)];
+        }
+    }
+
+    static objectBoxWay(definition) {
+        return (box) => {
+            let dependencies = definition.getDependencies() || {};
+
+            let result = {};
+
+            for (var name in dependencies) {
+                var value = dependencies[name];
+                if (Reflection.isFunction(value)) {
+                    result[name] = value(box.context());
+                } else {
+                    result[name] = box.get(dependencies[name]);
+                }
+            }
+
+            return result;
         }
     }
 

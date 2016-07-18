@@ -11,6 +11,8 @@ module.exports = class Creator {
             return this.makeClass();
         } else if (Reflection.isFunction(this.definition.getDefinition())) {
             return this.makeFunction();
+        } else if (this.definition.getMeta().box) {
+            return this.makeBox();
         } else {
             throw new Error('Unexpected definition type');
         }
@@ -38,6 +40,22 @@ module.exports = class Creator {
             creator.prototype = it.prototype;
 
             return creator;
+        };
+    }
+
+
+    makeBox() {
+        return (box) => () => {
+
+            let dependencies = Dependency.create(this.definition)(box);
+
+            let child = this.definition.getDefinition();
+
+            for(var name in dependencies) {
+                child.add(name, dependencies[name])
+            }
+
+            return child;
         };
     }
 

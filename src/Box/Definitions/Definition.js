@@ -2,6 +2,7 @@ let Reflection = require('../../Reflection/Reflection');
 let Observer = require('../../Actives/Observer');
 let ObjectObserver = require('../../Actives/ObjectObserver');
 let FunctionObserver = require('../../Actives/FunctionObserver');
+// let Box = require('../Box');
 
 module.exports = class Definition {
     constructor(name, definition, dependencies) {
@@ -10,6 +11,16 @@ module.exports = class Definition {
         this.dependencies = dependencies;
 
         this.reset();
+    }
+
+    setMeta(meta = {}) {
+        this.meta = this.meta || {};
+        Reflection.merge(this.meta, meta)
+    }
+
+    getMeta() {
+        this.setMeta();
+        return this.meta;
     }
 
     getName() {
@@ -35,6 +46,10 @@ module.exports = class Definition {
         }
 
         this.resolved = true;
+    }
+
+    unresolve() {
+        this.resolved = false;
     }
 
     getOriginValue() {
@@ -73,13 +88,14 @@ module.exports = class Definition {
         this.originValue = undefined;
         this.observer = undefined;
         this.connected = false;
+        this.meta = undefined;
     }
 
     static create(name, definition, dependencies) {
         if (Reflection.isFunction(definition)) {
             return new Definition(name, definition, dependencies);
-        } else if(Reflection.isPureObject(definition)){
-            var _definition = new Definition(name, definition);
+        } else if (Reflection.isPureObject(definition)) {
+            var _definition = new Definition(name, definition, dependencies);
             _definition.resolve(definition);
             return _definition;
         } else {

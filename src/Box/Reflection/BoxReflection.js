@@ -1,25 +1,21 @@
 let Reflection = require('../../Reflection/Reflection');
+var Definition = require('../Definitions/Definition');
 
 module.exports = class BoxReflection {
 
-    static addBox({box, child, dependencies}) {
-        if (Reflection.isPureObject(dependencies)) {
-            var context = box.context();
+    static getDefinitions(box) {
+        return box._definitions;
+    }
+    
+    static getDefinition(box, name) {
+        return this.getDefinitions(box).get(name    );
+    }
+    
+    static addBox({box, name, child, dependencies}) {
+        var definition = new Definition(name, child, dependencies);
+        definition.setMeta({box: true});
 
-            // @@@ wrong way
-            for (var name in dependencies) {
-                var path = dependencies[name];
-                var value;
-
-                if (Reflection.isFunction(path)) {
-                    value = path(context);
-                } else {
-                    value = box.get(path)
-                }
-
-                child.add(name, value);
-            }
-        }
+        this.getDefinitions(box).add(name, definition);
     }
 
     static has(box, name) {
