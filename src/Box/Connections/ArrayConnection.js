@@ -3,16 +3,16 @@ let Connection = require('./Connection');
 module.exports = class ArrayConnection extends Connection {
     constructor(name) {
         super(name);
-        this.connections = undefined;
+        this._connections = undefined;
         this.context = undefined;
     }
 
     setConnections(connections) {
-        this.connections = connections;
+        this._connections = connections;
     }
 
     makeRelations(box, event) {
-        this.connections.forEach((connection) => box.get(connection.getName()));
+        this._connections.forEach((connection) => box.get(connection.getName()));
     }
 
     notify(box, event) {
@@ -28,7 +28,7 @@ module.exports = class ArrayConnection extends Connection {
         if (!this.context) {
             var map = {};
 
-            this.connections.forEach((connection) => {
+            this._connections.forEach((connection) => {
                 map[connection.getName()] = () => connection.getOriginValue();
             });
 

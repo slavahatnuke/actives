@@ -8,7 +8,6 @@ describe('x.js', () => {
         box.add('A', () => 1)
         box.add('B', 2);
         //
-        // let context = box.context();
         // expect(box.A).equal(1);
         // expect(box.B).equal(2);
         // expect(box.self).equal(box);

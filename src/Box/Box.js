@@ -7,21 +7,22 @@ let Connections = require('./Connections/Connections');
 
 let Connector = require('./Connections/Connector');
 let Accessor = require('./Accessor/Accessor');
+let BoxReflection = require('./Reflection/BoxReflection');
 
 module.exports = class Box {
     constructor() {
-        this.definitions = new Definitions();
-        this.connections = new Connections();
-        this.factory = new Factory();
-        this.contextValue = undefined;
+        this._definitions = new Definitions();
+        this._connections = new Connections();
+        this._factory = new Factory();
+        this._contextValue = undefined;
     }
 
     add(name, definition, dependencies) {
         this.remove(name);
-        this.definitions.add(name, Definition.create(name, definition, dependencies));
+        this._definitions.add(name, Definition.create(name, definition, dependencies));
 
         if (definition instanceof Box) {
-            Factory.addBox({
+            BoxReflection.addBox({
                 box: this,
                 child: definition,
                 dependencies: dependencies
@@ -40,43 +41,43 @@ module.exports = class Box {
             return Accessor.path(name)(this);
         }
 
-        if (!this.definitions.isResolved(name)) {
-            this.definitions.resolve(name, this.create(name));
+        if (!this._definitions.isResolved(name)) {
+            this._definitions.resolve(name, this.create(name));
         }
 
-        if (this.connections.has(name)) {
-            if (!this.connections.get(name).hasState()) {
-                this.connections.get(name).notify(this, {
+        if (this._connections.has(name)) {
+            if (!this._connections.get(name).hasState()) {
+                this._connections.get(name).notify(this, {
                     type: 'CONNECTION_INIT',
                     name: name,
                     box: this
                 });
             }
 
-            return this.connections.get(name).getState();
+            return this._connections.get(name).getState();
         }
 
-        return this.definitions.getResolved(name);
+        return this._definitions.getResolved(name);
     }
 
     remove(name) {
-        if (this.definitions.has(name)) {
-            this.definitions.remove(name);
+        if (this._definitions.has(name)) {
+            this._definitions.remove(name);
         }
 
-        if (this.connections.has(name)) {
-            this.connections.remove(name);
+        if (this._connections.has(name)) {
+            this._connections.remove(name);
         }
     }
 
     keys() {
-        return this.definitions.keys().concat(this.connections.keys());
+        return this._definitions.keys().concat(this._connections.keys());
     }
 
     //@@ re-think, should it be public?
     create(name) {
-        if (this.definitions.isDefinition(name)) {
-            return this.factory.create(this, this.definitions.get(name));
+        if (this._definitions.isDefinition(name)) {
+            return this._factory.create(this, this._definitions.get(name));
         }
     }
 
@@ -85,15 +86,15 @@ module.exports = class Box {
             name: name,
             service: service,
             box: this,
-            definitions: this.definitions,
-            connections: this.connections
+            definitions: this._definitions,
+            connections: this._connections
         });
     }
 
 
     context(map = null) {
-        if (!map && this.contextValue) {
-            return this.contextValue;
+        if (!map && this._contextValue) {
+            return this._contextValue;
         }
 
         let _map = map || {};
@@ -113,7 +114,7 @@ module.exports = class Box {
         });
 
         if (!map) {
-            this.contextValue = context;
+            this._contextValue = context;
         }
 
         return context;
