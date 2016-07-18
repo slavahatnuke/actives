@@ -15,6 +15,12 @@ module.exports = class Box {
         this._connections = new Connections();
         this._factory = new Factory();
         this._contextValue = undefined;
+        this._names = new Map();
+
+        BoxReflection.addName({
+            box: this,
+            name: 'self'
+        });
     }
 
     add(name, definition, dependencies) {
@@ -29,6 +35,10 @@ module.exports = class Box {
             });
         }
 
+        BoxReflection.addName({
+            box: this,
+            name
+        });
         return this;
     }
 
@@ -61,6 +71,7 @@ module.exports = class Box {
     }
 
     remove(name) {
+
         if (this._definitions.has(name)) {
             this._definitions.remove(name);
         }
@@ -83,9 +94,9 @@ module.exports = class Box {
 
     connect(name, service) {
         return Connector.connect({
+            box: this,
             name: name,
             service: service,
-            box: this,
             definitions: this._definitions,
             connections: this._connections
         });

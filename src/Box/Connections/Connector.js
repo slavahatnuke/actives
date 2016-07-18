@@ -3,6 +3,7 @@ let ConnectionConnection = require('./ConnectionConnection');
 let ArrayConnection = require('./ArrayConnection');
 
 let Reflection = require('../../Reflection/Reflection');
+let BoxReflection = require('../../Box/Reflection/BoxReflection');
 
 module.exports = class Connector {
     static createConnection({name, service, box, definitions, connections}) {
@@ -58,6 +59,9 @@ module.exports = class Connector {
         }
 
         connections.add(connection);
+
+        BoxReflection.addName({box, name});
+
         return connection;
     }
 }
