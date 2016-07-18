@@ -1,4 +1,3 @@
-require('chai').should();
 let expect = require('chai').expect;
 
 var actives = require('../actives');
@@ -1034,4 +1033,10 @@ describe('Box', () => {
             done();
         }, 20);
     });
+
+    it('A', () => {
+        let box = actives.Box.create();
+        expect(box.get('self')).equal(box);
+    });
+
 });
