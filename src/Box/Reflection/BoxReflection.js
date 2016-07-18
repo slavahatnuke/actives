@@ -6,6 +6,10 @@ module.exports = class BoxReflection {
     static getDefinitions(box) {
         return box._definitions;
     }
+
+    static getConnections(box) {
+        return box._connections;
+    }
     
     static getDefinition(box, name) {
         return this.getDefinitions(box).get(name    );
@@ -22,7 +26,7 @@ module.exports = class BoxReflection {
         return box._connections.has(name) || box._definitions.has(name);
     }
 
-    static addName({box, name}) {
+    static addName(box, name) {
         if(!box._names.has(name)) {
             Reflection.defineName(box, name, (name) => box.get(name), (name, value) => box.add(name, value));
             box._names.set(name, name);

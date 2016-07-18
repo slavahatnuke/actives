@@ -1,14 +1,40 @@
 let DefinitionConnection = require('./DefinitionConnection');
 let ConnectionConnection = require('./ConnectionConnection');
 let ArrayConnection = require('./ArrayConnection');
+let ObjectConnection = require('./ObjectConnection');
 
 let Reflection = require('../../Reflection/Reflection');
 let BoxReflection = require('../../Box/Reflection/BoxReflection');
 
 module.exports = class Connector {
-    static createConnection({name, service, box, definitions, connections}) {
+    static createConnection({name, service, box}) {
+
+        let definitions = BoxReflection.getDefinitions(box);
+        let connections = BoxReflection.getConnections(box);
 
         let connection;
+
+        if (!connection && Reflection.isPureObject(service)) {
+            connection = new ObjectConnection(name);
+
+            let items = {};
+
+            for (var name in service) {
+                var value = service[name];
+
+                var child = this.createConnection({
+                    name: value,
+                    service: value,
+                    box
+                });
+
+                items[name] = child;
+
+                child.subscribe((event) => connection.notify(box, event));
+            }
+
+            connection.setConnections(items);
+        }
 
         if (!connection && Reflection.isArray(service)) {
             connection = new ArrayConnection(name);
@@ -17,9 +43,7 @@ module.exports = class Connector {
                 var child = this.createConnection({
                     name: service,
                     service,
-                    box,
-                    definitions,
-                    connections
+                    box
                 });
 
                 child.subscribe((event) => connection.notify(box, event));
@@ -43,15 +67,15 @@ module.exports = class Connector {
         return connection;
     }
 
-    static connect({name, service, box, definitions, connections}) {
+    static connect({name, service, box}) {
+        let connections = BoxReflection.getConnections(box);
+
         box.remove(name);
 
         let connection = this.createConnection({
             name,
             service,
-            box,
-            definitions,
-            connections
+            box
         });
 
         if (!connection) {
@@ -60,7 +84,7 @@ module.exports = class Connector {
 
         connections.add(connection);
 
-        BoxReflection.addName({box, name});
+        BoxReflection.addName(box, name);
 
         return connection;
     }

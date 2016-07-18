@@ -19,16 +19,11 @@ describe('x.js', () => {
             }
         }
 
-
-        let counterModule = actives.Box.create();
-        counterModule.add('Counter', Counter);
-
-        let app = actives.Box.create();
-        app.add('counterModule', counterModule);
-
+        let box = actives.Box.create();
+        box.add('Counter', Counter);
 
         let xCounter = null;
-        app.connect('counterView', {childCounter: 'counterModule/counter'})
+        box.connect('counterView', {childCounter: 'Counter'})
             .model(({childCounter}) => {
                 xCounter = childCounter.get();
 
@@ -37,11 +32,13 @@ describe('x.js', () => {
                 }
             });
 
-        expect(app.counterView).deep.equal({counter: 0});
+
+        expect(box.counterView).deep.equal({counter: 0});
+
 
         expect(xCounter).equal(0)
-        app.counterModule.Counter.up();
-        expect(xCounter).equal(1)
-
+        box.Counter.up();
+        box.Counter.up();
+        expect(xCounter).equal(2)
     });
 });

@@ -1,6 +1,6 @@
 let Connection = require('./Connection');
 
-module.exports = class ArrayConnection extends Connection {
+module.exports = class ObjectConnection extends Connection {
     constructor(name) {
         super(name);
         this.connections = undefined;
@@ -12,7 +12,9 @@ module.exports = class ArrayConnection extends Connection {
     }
 
     makeRelations(box, event) {
-        this.connections.forEach((connection) => box.get(connection.getName()));
+        for (var name in this.connections) {
+            box.get(this.connections[name].getName());
+        }
     }
 
     notify(box, event) {
@@ -24,19 +26,21 @@ module.exports = class ArrayConnection extends Connection {
     }
 
     getContext(box) {
-
         if (!this.context) {
             var map = {};
 
-            this.connections.forEach((connection) => {
-                map[connection.getName()] = () => connection.getOriginValue();
-            });
+            let define = (key, connection) => map[key] = () => connection.getOriginValue();
+
+            for (var name in this.connections) {
+                define(name, this.connections[name]);
+            }
 
             this.context = box.context(map);
         }
 
         return this.context;
     }
+
     reset() {
         this.connections = undefined;
         this.context = undefined;

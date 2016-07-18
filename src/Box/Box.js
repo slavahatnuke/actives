@@ -17,10 +17,7 @@ module.exports = class Box {
         this._contextValue = undefined;
         this._names = new Map();
 
-        BoxReflection.addName({
-            box: this,
-            name: 'self'
-        });
+        BoxReflection.addName(this, 'self');
     }
 
     add(name, definition, dependencies) {
@@ -37,11 +34,8 @@ module.exports = class Box {
             this._definitions.add(name, Definition.create(name, definition, dependencies));
         }
 
-        BoxReflection.addName({
-            box: this,
-            name
-        });
-        
+        BoxReflection.addName(this, name);
+
         return this;
     }
 
@@ -99,9 +93,7 @@ module.exports = class Box {
         return Connector.connect({
             box: this,
             name: name,
-            service: service,
-            definitions: this._definitions,
-            connections: this._connections
+            service: service
         });
     }
 
