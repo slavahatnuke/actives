@@ -3,13 +3,13 @@ let Reflection = require('../../Reflection/Reflection');
 
 module.exports = class Definitions {
     constructor() {
-        this._definitions = new Map();
+        this.definitions = new Map();
         this.values = new Map();
     }
 
     add(name, definition) {
         if (definition instanceof Definition) {
-            this._definitions.set(definition.getName(), definition);
+            this.definitions.set(definition.getName(), definition);
         } else {
             this.values.set(name, definition);
         }
@@ -21,8 +21,8 @@ module.exports = class Definitions {
         }
 
         if(this.isDefinition(name))  {
-            this._definitions.get(name).reset();
-            this._definitions.delete(name);
+            this.definitions.get(name).reset();
+            this.definitions.delete(name);
         }
     }
 
@@ -32,7 +32,7 @@ module.exports = class Definitions {
 
     get(name) {
         if (this.isDefinition(name)) {
-            return this._definitions.get(name);
+            return this.definitions.get(name);
         } else {
             return this.values.get(name);
         }
@@ -47,7 +47,7 @@ module.exports = class Definitions {
     }
 
     isDefinition(name) {
-        return this._definitions.has(name);
+        return this.definitions.has(name);
     }
 
     isValue(name) {
@@ -64,14 +64,14 @@ module.exports = class Definitions {
 
     resolve(name, value) {
         if (this.isDefinition(name)) {
-            this._definitions.get(name).resolve(value)
+            this.definitions.get(name).resolve(value)
         } else {
             this.values.set(name, value);
         }
     }
 
     keys() {
-        return Reflection.iteratorToArray(this.values.keys()).concat(Reflection.iteratorToArray(this._definitions.keys()));
+        return Reflection.iteratorToArray(this.values.keys()).concat(Reflection.iteratorToArray(this.definitions.keys()));
     }
 
 
