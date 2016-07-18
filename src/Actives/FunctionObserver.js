@@ -24,23 +24,21 @@ module.exports = function (origin, context, observer = () => null) {
             result.then(
                 (result) => {
 
-                    // @@@ add setTimeout
-                    notify({
+                    setTimeout(() => notify({
                         type: 'CALL_ASYNC_OK',
                         arguments: args,
                         result
-                    });
+                    }), 0);
 
                     return result;
                 },
                 (result) => {
 
-                    // @@@ add setTimeout
-                    notify({
+                    setTimeout(() => notify({
                         type: 'CALL_ASYNC_REJECT',
                         arguments: args,
                         result
-                    });
+                    }), 0);
 
                     return result;
                 });
