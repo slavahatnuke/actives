@@ -22,6 +22,7 @@ module.exports = class Definition {
 
     resolve(value) {
         this.originValue = value;
+        this.value = value;
 
         if (this.isConnected()) {
             if (Reflection.isPureObject(value)) {
@@ -31,8 +32,6 @@ module.exports = class Definition {
             } else {
                 this.value = value;
             }
-        } else {
-            this.value = value;
         }
 
         this.resolved = true;

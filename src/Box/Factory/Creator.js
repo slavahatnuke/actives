@@ -10,7 +10,7 @@ module.exports = class Creator {
         if (Reflection.isClass(this.definition.getDefinition())) {
             return this.makeClass();
         } else if (Reflection.isFunction(this.definition.getDefinition())) {
-            return this.makeFunction()
+            return this.makeFunction();
         } else {
             throw new Error('Unexpected definition type');
         }

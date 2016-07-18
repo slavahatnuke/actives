@@ -29,6 +29,10 @@ module.exports = class Connection {
         return this;
     }
 
+    model(creator) {
+        return this.state(creator);
+    }
+
     actions(creator) {
         if (Reflection.isFunction(creator)) {
             this.actionsCreator = creator;

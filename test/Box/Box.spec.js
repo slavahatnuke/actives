@@ -1063,4 +1063,32 @@ describe('Box', () => {
         expect(box.self).equal(box);
     });
 
+
+    it('A', () => {
+        let app = actives.Box.create();
+        let box = actives.Box.create();
+
+        box.add('object', () => {
+            return {
+                counter: 1,
+                up: function () {
+                    this.counter++;
+                }
+            };
+        });
+
+        let aObject = null;
+        box.connect('view', 'object').model(({object}) => {
+            aObject = object;
+        });
+
+        // get box view and init all tree
+        box.view;
+
+        expect(aObject.counter).equal(1);
+
+        box.object.counter = 5;
+        expect(aObject.counter).equal(5);
+    });
+
 });
