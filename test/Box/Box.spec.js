@@ -1078,9 +1078,11 @@ describe('Box', () => {
         });
 
         let aObject = null;
-        box.connect('view', 'object').model(({object}) => {
-            aObject = object;
-        });
+        /// state and model are equal
+        box.connect('view', 'object')
+            .model(({object}) => {
+                aObject = object;
+            });
 
         // get box view and init all tree
         box.view;
