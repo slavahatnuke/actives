@@ -1039,4 +1039,16 @@ describe('Box', () => {
         expect(box.get('self')).equal(box);
     });
 
+
+    it('A', () => {
+        let box = actives.Box.create();
+        box.add('A', () => 1);
+        box.add('B', 2);
+
+        let context = box.context();
+        expect(context.A).equal(1);
+        expect(context.B).equal(2);
+        expect(context.self).equal(box);
+    });
+
 });
