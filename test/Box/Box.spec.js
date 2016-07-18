@@ -788,11 +788,11 @@ describe('Box', () => {
 
         app.add('testValue', 25);
         app.add('CounterBox2', creator(), {
-            defaultValue: () => 500,
+            defaultValue: ({testValue}) => testValue + 500,
             valueA: 'testValue'
         });
 
-        expect(app.get('CounterBox2/counter/counter')).equal(500);
+        expect(app.get('CounterBox2/counter/counter')).equal(525);
         expect(app.get('CounterBox2/valueA')).equal(25);
     });
 
