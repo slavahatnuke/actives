@@ -344,12 +344,12 @@ describe('Box', () => {
         let onUp2 = box.get('Presentation').onUp;
 
         expect(onUp).equal(onUp2);
-        expect(stateCounter).equal(3);
+        expect(stateCounter).equal(2);
         expect(actionsCounter).equal(1);
 
         box.get('Presentation').onUp();
 
-        expect(stateCounter).equal(5);
+        expect(stateCounter).equal(3);
         expect(actionsCounter).equal(1);
 
 

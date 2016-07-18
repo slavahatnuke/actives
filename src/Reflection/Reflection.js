@@ -109,8 +109,8 @@ module.exports = class Reflection {
         return [...new Set(names)];
     }
 
-    static merge(target, ...args) {
-        return Object.assign.apply(Object, [target, ...args])
+    static merge(...args) {
+        return Object.assign.apply(Object, args);
     }
 
 }

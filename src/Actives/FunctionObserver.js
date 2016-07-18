@@ -1,38 +1,45 @@
 let Reflection = require('../Reflection/Reflection');
+let Observer = require('./Observer');
 
 module.exports = function (origin, context, observer = () => null) {
-    var wrapper = function (...args) {
-        var result = origin.apply(context, args);
 
-        observer({
-            type: 'CALL',
+    let notify = Observer.notifier({
+        origin,
+        context,
+        type: 'CALL'
+    })(observer);
+
+    var wrapper = function (...args) {
+
+        observer.locked = true;
+        var result = origin.apply(context, args);
+        observer.locked = false;
+
+        notify({
             arguments: args,
-            result: result,
-            origin: origin,
-            context: context
+            result
         });
 
         if (Reflection.isPromise(result)) {
             result.then(
                 (result) => {
 
-                    observer({
+                    // @@@ add setTimeout
+                    notify({
                         type: 'CALL_ASYNC_OK',
                         arguments: args,
-                        result: result,
-                        origin: origin,
-                        context: context
+                        result
                     });
 
                     return result;
                 },
                 (result) => {
-                    observer({
+
+                    // @@@ add setTimeout
+                    notify({
                         type: 'CALL_ASYNC_REJECT',
                         arguments: args,
-                        result: result,
-                        origin: origin,
-                        context: context
+                        result
                     });
 
                     return result;
