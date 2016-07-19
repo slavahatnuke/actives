@@ -57,7 +57,7 @@ module.exports = class Connector {
         if (!connection && definitions.isDefinition(service)) {
             var definition = definitions.get(service);
             connection = new DefinitionConnection(name, definition);
-            definition.connect((event) => connection.notify(box, event));
+            definition.subscribe((event) => connection.notify(box, event));
         }
 
         if (!connection && connections.has(service)) {

@@ -66,10 +66,6 @@ module.exports = class Definition {
         return this.definition;
     }
 
-    connect(observer) {
-        this.subscribe(observer);
-    }
-
     subscribe(observer) {
         this.connected = true;
         this.observer = this.observer || new Observer();

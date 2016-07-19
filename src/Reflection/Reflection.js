@@ -42,7 +42,7 @@ module.exports = class Reflection {
     }
 
     static getPropertyNames(object) {
-        return Object.keys(object);
+        return this.keys(object);
     }
 
     static keys(object) {
@@ -80,18 +80,16 @@ module.exports = class Reflection {
     }
 
     static clone(object) {
-        if (this.isArray(object)) {
-            return object.slice(0);
-        } else if (this.isObject(object)) {
+        if (this.isObject(object)) {
             var _clone = function () {
                 return this;
             };
 
             _clone.prototype = object;
             return new _clone();
-        } else {
-            return object;
         }
+        
+        return object;
     }
 
     static constructCreator(_class, args) {

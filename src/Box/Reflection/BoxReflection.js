@@ -17,10 +17,6 @@ module.exports = class BoxReflection {
         this.getDefinitions(box).add(name, definition);
     }
 
-    static has(box, name) {
-        return box._connections.has(name) || box._definitions.has(name);
-    }
-
     static addName(box, name) {
         if (!box._names.has(name)) {
             Reflection.defineName(box, name, (name) => box.get(name), (name, value) => box.add(name, value));
