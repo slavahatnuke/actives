@@ -10,10 +10,6 @@ module.exports = class BoxReflection {
         return box._connections;
     }
 
-    static getDefinition(box, name) {
-        return this.getDefinitions(box).get(name);
-    }
-
     static addBox({box, name, child, dependencies}) {
         var definition = new Definition(name, child, dependencies);
         definition.setMeta({box: true});
