@@ -1123,7 +1123,6 @@ describe('Box', () => {
                 }
             })
             .actions(({myCounter}) => {
-                console.log(myCounter);
                 return {
                     onUp: () => myCounter.up()
                 }
@@ -1197,5 +1196,33 @@ describe('Box', () => {
         expect(xCounter).equal(4)
         expect(app.counterView.counter).equal(4);
 
+    });
+
+
+    it('A', () => {
+        var box = actives.Box.create();
+
+        box.add('Counter', {
+            counter: 1,
+            up: function () {
+                this.counter++;
+            }
+        });
+
+        box.connect('CounterState', 'Counter')
+            .state(({Counter}) => {
+                return {
+                    counter: Counter.counter
+                }
+            })
+            .actions(({Counter}) => {
+                return {
+                    up: () => Counter.up()
+                };
+            });
+
+        expect(box.CounterState.counter).equal(1);
+        box.Counter.up();
+        expect(box.CounterState.counter).equal(2);
     });
 });

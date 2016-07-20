@@ -114,4 +114,12 @@ module.exports = class Connection {
     getStateContext(box) {
         return box.context();
     }
+
+    static subscribe(state, subscriber) {
+
+    }
+
+    static unsubscribe(state, subscriber) {
+
+    }
 }

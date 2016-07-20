@@ -37,7 +37,12 @@ module.exports = class Reflection {
     }
 
     static getMethodNames(object) {
-        return Object.getOwnPropertyNames(this.getPrototype(object));
+        var prototype = this.getPrototype(object);
+        
+        if(prototype == Object.prototype) {
+            return [];
+        }
+        return Object.getOwnPropertyNames(prototype);
     }
 
     static getPrototype(object) {

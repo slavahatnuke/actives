@@ -67,6 +67,11 @@ module.exports = class Definition {
     }
 
     subscribe(observer) {
+        if(!this.isConnected() && this.isResolved()) {
+            this.connected = true;
+            this.resolve(this.getValue());
+        }
+
         this.connected = true;
         this.observer = this.observer || new Observer();
         this.observer.subscribe(observer);
