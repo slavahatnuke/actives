@@ -14,7 +14,10 @@ module.exports = class Reflection {
     }
 
     static isClass(object) {
-        return this.isFunction(object) && /^\s*class\s+/.test(object.toString());
+        return this.isFunction(object)
+            && (
+            /^\s*class\s+/.test(object.toString()) ||
+            /_classCallCheck/igm.test(object.toString()) );
     }
 
     static isFunction(object) {
@@ -88,7 +91,7 @@ module.exports = class Reflection {
             _clone.prototype = object;
             return new _clone();
         }
-        
+
         return object;
     }
 
