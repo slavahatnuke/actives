@@ -1807,7 +1807,7 @@ var actives =
 	    }, {
 	        key: 'addName',
 	        value: function addName(box, name) {
-	            if (!box._names.has(name)) {
+	            if (!box._names.has(name) && !(name in box)) {
 	                Reflection.defineName(box, name, function (name) {
 	                    return box.get(name);
 	                }, function (name, value) {
