@@ -21,7 +21,7 @@
     "test.es5": "VERSION=es5 mocha --recursive",
     "test.es5.browser": "VERSION=es5.browser mocha --recursive",
     "test.es5.browser.min": "VERSION=es5.browser.min mocha --recursive",
-    "test.all": "npm run test && npm run test.es5.browser && npm run test.es5.browser.min",
+    "test.all": "npm run test && npm run test.es5  && npm run test.es5.browser && npm run test.es5.browser.min",
     "build.and.test": "npm run build && npm run test.all"
   },
   "repository": {

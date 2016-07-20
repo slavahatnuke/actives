@@ -55,20 +55,320 @@ module.exports =
 
 	'use strict';
 
-	var Reflection = __webpack_require__(2);
-	var Box = __webpack_require__(3);
-
-	Reflection.defineName(exports, 'box', function () {
-	  return Box.create();
-	});
-
-	exports.Box = Box;
-	exports.Reflection = Reflection;
+	exports.Box = __webpack_require__(2);
+	exports.Reflection = __webpack_require__(4);
 	exports.BoxReflection = __webpack_require__(19);
 	exports.Connection = __webpack_require__(13);
 
 /***/ },
 /* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Definition = __webpack_require__(3);
+	var Definitions = __webpack_require__(8);
+	var Factory = __webpack_require__(9);
+
+	var Reflection = __webpack_require__(4);
+	var Connections = __webpack_require__(12);
+
+	var Connector = __webpack_require__(14);
+	var Accessor = __webpack_require__(20);
+	var BoxReflection = __webpack_require__(19);
+
+	module.exports = function () {
+	    function Box() {
+	        _classCallCheck(this, Box);
+
+	        this._definitions = new Definitions();
+	        this._connections = new Connections();
+	        this._factory = new Factory();
+	        this._contextValue = undefined;
+	        this._names = new Map();
+
+	        BoxReflection.addName(this, 'self');
+	    }
+
+	    _createClass(Box, [{
+	        key: 'add',
+	        value: function add(name, definition, dependencies) {
+	            this.remove(name);
+
+	            if (definition instanceof Box) {
+	                BoxReflection.addBox({
+	                    box: this,
+	                    name: name,
+	                    child: definition,
+	                    dependencies: dependencies
+	                });
+	            } else {
+	                this._definitions.add(name, Definition.create(name, definition, dependencies));
+	            }
+
+	            BoxReflection.addName(this, name);
+
+	            return this;
+	        }
+	    }, {
+	        key: 'get',
+	        value: function get(name) {
+	            if (name === 'self') {
+	                return this;
+	            }
+
+	            if (Accessor.isPath(name)) {
+	                return Accessor.path(name)(this);
+	            }
+
+	            if (!this._definitions.isResolved(name)) {
+	                this._definitions.resolve(name, this.create(name));
+	            }
+
+	            if (this._connections.has(name)) {
+	                if (!this._connections.get(name).hasState()) {
+	                    this._connections.get(name).notify(this, {
+	                        type: 'CONNECTION_INIT',
+	                        name: name,
+	                        box: this
+	                    });
+	                }
+
+	                return this._connections.get(name).getState();
+	            }
+
+	            return this._definitions.getResolved(name);
+	        }
+	    }, {
+	        key: 'remove',
+	        value: function remove(name) {
+
+	            if (this._definitions.has(name)) {
+	                this._definitions.remove(name);
+	            }
+
+	            if (this._connections.has(name)) {
+	                this._connections.remove(name);
+	            }
+	        }
+	    }, {
+	        key: 'keys',
+	        value: function keys() {
+	            return this._definitions.keys().concat(this._connections.keys());
+	        }
+
+	        //@@ re-think, should it be public?
+
+	    }, {
+	        key: 'create',
+	        value: function create(name) {
+	            if (this._definitions.isDefinition(name)) {
+	                return this._factory.create(this, this._definitions.get(name));
+	            }
+	        }
+	    }, {
+	        key: 'connect',
+	        value: function connect(name, service) {
+	            return Connector.connect({
+	                box: this,
+	                name: name,
+	                service: service
+	            });
+	        }
+	    }, {
+	        key: 'context',
+	        value: function context() {
+	            var _this = this;
+
+	            var map = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+
+	            if (!map && this._contextValue) {
+	                return this._contextValue;
+	            }
+
+	            var _map = map || {};
+	            _map['self'] = function () {
+	                return _this;
+	            };
+
+	            var names = this.keys().concat(Reflection.keys(_map));
+	            names = Reflection.uniqueArray(names);
+
+	            var context = Reflection.defineNames({}, names, function (name) {
+	                var _name = _map[name] || name;
+
+	                if (Reflection.isFunction(_name)) {
+	                    return _name(_this.context());
+	                }
+
+	                return _this.get(_name);
+	            });
+
+	            if (!map) {
+	                this._contextValue = context;
+	            }
+
+	            return context;
+	        }
+	    }], [{
+	        key: 'create',
+	        value: function create() {
+	            return new Box();
+	        }
+	    }]);
+
+	    return Box;
+	}();
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Reflection = __webpack_require__(4);
+	var Observer = __webpack_require__(5);
+	var ObjectObserver = __webpack_require__(6);
+	var FunctionObserver = __webpack_require__(7);
+	// let Box = require('../Box');
+
+	module.exports = function () {
+	    function Definition(name, definition, dependencies) {
+	        _classCallCheck(this, Definition);
+
+	        this.name = name;
+	        this.definition = definition;
+	        this.dependencies = dependencies;
+
+	        this.reset();
+	    }
+
+	    _createClass(Definition, [{
+	        key: 'setMeta',
+	        value: function setMeta() {
+	            var meta = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	            this.meta = this.meta || {};
+	            Reflection.merge(this.meta, meta);
+	        }
+	    }, {
+	        key: 'getMeta',
+	        value: function getMeta() {
+	            this.setMeta();
+	            return this.meta;
+	        }
+	    }, {
+	        key: 'getName',
+	        value: function getName() {
+	            return this.name;
+	        }
+	    }, {
+	        key: 'getValue',
+	        value: function getValue() {
+	            return this.value;
+	        }
+	    }, {
+	        key: 'isResolved',
+	        value: function isResolved() {
+	            return this.resolved;
+	        }
+	    }, {
+	        key: 'resolve',
+	        value: function resolve(value) {
+	            var _this = this;
+
+	            this.originValue = value;
+	            this.value = value;
+
+	            if (this.isConnected()) {
+	                if (Reflection.isPureObject(value)) {
+	                    this.value = ObjectObserver(value, function (payload) {
+	                        return _this.observer.notify(payload);
+	                    });
+	                } else if (Reflection.isFunction(value)) {
+	                    this.value = FunctionObserver(value, {}, function (payload) {
+	                        return _this.observer.notify(payload);
+	                    });
+	                }
+	            }
+
+	            this.resolved = true;
+	        }
+	    }, {
+	        key: 'getOriginValue',
+	        value: function getOriginValue() {
+	            return this.originValue;
+	        }
+	    }, {
+	        key: 'getResolved',
+	        value: function getResolved() {
+	            return this.value;
+	        }
+	    }, {
+	        key: 'getDependencies',
+	        value: function getDependencies() {
+	            return this.dependencies;
+	        }
+	    }, {
+	        key: 'getDefinition',
+	        value: function getDefinition() {
+	            return this.definition;
+	        }
+	    }, {
+	        key: 'subscribe',
+	        value: function subscribe(observer) {
+	            if (!this.isConnected() && this.isResolved()) {
+	                this.connected = true;
+	                this.resolve(this.getValue());
+	            }
+
+	            this.connected = true;
+	            this.observer = this.observer || new Observer();
+	            this.observer.subscribe(observer);
+	        }
+	    }, {
+	        key: 'isConnected',
+	        value: function isConnected() {
+	            return this.connected;
+	        }
+	    }, {
+	        key: 'reset',
+	        value: function reset() {
+	            this.resolved = false;
+	            this.value = undefined;
+	            this.originValue = undefined;
+	            this.observer = undefined;
+	            this.connected = false;
+	            this.meta = undefined;
+	        }
+	    }], [{
+	        key: 'create',
+	        value: function create(name, definition, dependencies) {
+	            if (Reflection.isFunction(definition)) {
+	                return new Definition(name, definition, dependencies);
+	            } else if (Reflection.isPureObject(definition)) {
+	                var _definition = new Definition(name, definition, dependencies);
+	                _definition.resolve(definition);
+	                return _definition;
+	            } else {
+	                return definition;
+	            }
+	        }
+	    }]);
+
+	    return Definition;
+	}();
+
+/***/ },
+/* 4 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -263,313 +563,6 @@ module.exports =
 	}();
 
 /***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Definition = __webpack_require__(4);
-	var Definitions = __webpack_require__(8);
-	var Factory = __webpack_require__(9);
-
-	var Reflection = __webpack_require__(2);
-	var Connections = __webpack_require__(12);
-
-	var Connector = __webpack_require__(14);
-	var Accessor = __webpack_require__(20);
-	var BoxReflection = __webpack_require__(19);
-
-	module.exports = function () {
-	    function Box() {
-	        _classCallCheck(this, Box);
-
-	        this._definitions = new Definitions();
-	        this._connections = new Connections();
-	        this._factory = new Factory();
-	        this._contextValue = undefined;
-	        this._names = new Map();
-
-	        BoxReflection.addName(this, 'self');
-	    }
-
-	    _createClass(Box, [{
-	        key: 'add',
-	        value: function add(name, definition, dependencies) {
-	            this.remove(name);
-
-	            if (definition instanceof Box) {
-	                BoxReflection.addBox({
-	                    box: this,
-	                    name: name,
-	                    child: definition,
-	                    dependencies: dependencies
-	                });
-	            } else {
-	                this._definitions.add(name, Definition.create(name, definition, dependencies));
-	            }
-
-	            BoxReflection.addName(this, name);
-
-	            return this;
-	        }
-	    }, {
-	        key: 'get',
-	        value: function get(name) {
-	            if (name === 'self') {
-	                return this;
-	            }
-
-	            if (Accessor.isPath(name)) {
-	                return Accessor.path(name)(this);
-	            }
-
-	            if (!this._definitions.isResolved(name)) {
-	                this._definitions.resolve(name, this.create(name));
-	            }
-
-	            if (this._connections.has(name)) {
-	                if (!this._connections.get(name).hasState()) {
-	                    this._connections.get(name).notify(this, {
-	                        type: 'CONNECTION_INIT',
-	                        name: name,
-	                        box: this
-	                    });
-	                }
-
-	                return this._connections.get(name).getState();
-	            }
-
-	            return this._definitions.getResolved(name);
-	        }
-	    }, {
-	        key: 'remove',
-	        value: function remove(name) {
-
-	            if (this._definitions.has(name)) {
-	                this._definitions.remove(name);
-	            }
-
-	            if (this._connections.has(name)) {
-	                this._connections.remove(name);
-	            }
-	        }
-	    }, {
-	        key: 'keys',
-	        value: function keys() {
-	            return this._definitions.keys().concat(this._connections.keys());
-	        }
-
-	        //@@ re-think, should it be public?
-
-	    }, {
-	        key: 'create',
-	        value: function create(name) {
-	            if (this._definitions.isDefinition(name)) {
-	                return this._factory.create(this, this._definitions.get(name));
-	            }
-	        }
-	    }, {
-	        key: 'connect',
-	        value: function connect(name, service) {
-	            return Connector.connect({
-	                box: this,
-	                name: name,
-	                service: service
-	            });
-	        }
-	    }, {
-	        key: 'context',
-	        value: function context() {
-	            var _this = this;
-
-	            var map = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-
-	            if (!map && this._contextValue) {
-	                return this._contextValue;
-	            }
-
-	            var _map = map || {};
-	            _map['self'] = function () {
-	                return _this;
-	            };
-
-	            var names = this.keys().concat(Reflection.keys(_map));
-	            names = Reflection.uniqueArray(names);
-
-	            var context = Reflection.defineNames({}, names, function (name) {
-	                var _name = _map[name] || name;
-
-	                if (Reflection.isFunction(_name)) {
-	                    return _name(_this.context());
-	                }
-
-	                return _this.get(_name);
-	            });
-
-	            if (!map) {
-	                this._contextValue = context;
-	            }
-
-	            return context;
-	        }
-	    }], [{
-	        key: 'create',
-	        value: function create() {
-	            return new Box();
-	        }
-	    }]);
-
-	    return Box;
-	}();
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Reflection = __webpack_require__(2);
-	var Observer = __webpack_require__(5);
-	var ObjectObserver = __webpack_require__(6);
-	var FunctionObserver = __webpack_require__(7);
-	// let Box = require('../Box');
-
-	module.exports = function () {
-	    function Definition(name, definition, dependencies) {
-	        _classCallCheck(this, Definition);
-
-	        this.name = name;
-	        this.definition = definition;
-	        this.dependencies = dependencies;
-
-	        this.reset();
-	    }
-
-	    _createClass(Definition, [{
-	        key: 'setMeta',
-	        value: function setMeta() {
-	            var meta = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	            this.meta = this.meta || {};
-	            Reflection.merge(this.meta, meta);
-	        }
-	    }, {
-	        key: 'getMeta',
-	        value: function getMeta() {
-	            this.setMeta();
-	            return this.meta;
-	        }
-	    }, {
-	        key: 'getName',
-	        value: function getName() {
-	            return this.name;
-	        }
-	    }, {
-	        key: 'getValue',
-	        value: function getValue() {
-	            return this.value;
-	        }
-	    }, {
-	        key: 'isResolved',
-	        value: function isResolved() {
-	            return this.resolved;
-	        }
-	    }, {
-	        key: 'resolve',
-	        value: function resolve(value) {
-	            var _this = this;
-
-	            this.originValue = value;
-	            this.value = value;
-
-	            if (this.isConnected()) {
-	                if (Reflection.isPureObject(value)) {
-	                    this.value = ObjectObserver(value, function (payload) {
-	                        return _this.observer.notify(payload);
-	                    });
-	                } else if (Reflection.isFunction(value)) {
-	                    this.value = FunctionObserver(value, {}, function (payload) {
-	                        return _this.observer.notify(payload);
-	                    });
-	                }
-	            }
-
-	            this.resolved = true;
-	        }
-	    }, {
-	        key: 'getOriginValue',
-	        value: function getOriginValue() {
-	            return this.originValue;
-	        }
-	    }, {
-	        key: 'getResolved',
-	        value: function getResolved() {
-	            return this.value;
-	        }
-	    }, {
-	        key: 'getDependencies',
-	        value: function getDependencies() {
-	            return this.dependencies;
-	        }
-	    }, {
-	        key: 'getDefinition',
-	        value: function getDefinition() {
-	            return this.definition;
-	        }
-	    }, {
-	        key: 'subscribe',
-	        value: function subscribe(observer) {
-	            if (!this.isConnected() && this.isResolved()) {
-	                this.connected = true;
-	                this.resolve(this.getValue());
-	            }
-
-	            this.connected = true;
-	            this.observer = this.observer || new Observer();
-	            this.observer.subscribe(observer);
-	        }
-	    }, {
-	        key: 'isConnected',
-	        value: function isConnected() {
-	            return this.connected;
-	        }
-	    }, {
-	        key: 'reset',
-	        value: function reset() {
-	            this.resolved = false;
-	            this.value = undefined;
-	            this.originValue = undefined;
-	            this.observer = undefined;
-	            this.connected = false;
-	            this.meta = undefined;
-	        }
-	    }], [{
-	        key: 'create',
-	        value: function create(name, definition, dependencies) {
-	            if (Reflection.isFunction(definition)) {
-	                return new Definition(name, definition, dependencies);
-	            } else if (Reflection.isPureObject(definition)) {
-	                var _definition = new Definition(name, definition, dependencies);
-	                _definition.resolve(definition);
-	                return _definition;
-	            } else {
-	                return definition;
-	            }
-	        }
-	    }]);
-
-	    return Definition;
-	}();
-
-/***/ },
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -579,7 +572,7 @@ module.exports =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 
 	module.exports = function () {
 	    function Observer() {
@@ -640,7 +633,7 @@ module.exports =
 
 	'use strict';
 
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 	var FunctionObserver = __webpack_require__(7);
 	var Observer = __webpack_require__(5);
 
@@ -688,7 +681,7 @@ module.exports =
 
 	'use strict';
 
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 	var Observer = __webpack_require__(5);
 
 	module.exports = function (origin, context) {
@@ -760,8 +753,8 @@ module.exports =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Definition = __webpack_require__(4);
-	var Reflection = __webpack_require__(2);
+	var Definition = __webpack_require__(3);
+	var Reflection = __webpack_require__(4);
 
 	module.exports = function () {
 	    function Definitions() {
@@ -890,7 +883,7 @@ module.exports =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 	var Dependency = __webpack_require__(11);
 
 	module.exports = function () {
@@ -984,7 +977,7 @@ module.exports =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 
 	module.exports = function () {
 	    function Dependency(definition) {
@@ -1136,7 +1129,7 @@ module.exports =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Connection = __webpack_require__(13);
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 
 	module.exports = function () {
 	    function Connections() {
@@ -1190,7 +1183,7 @@ module.exports =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Observer = __webpack_require__(5);
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 
 	var connectionSymbol = Symbol("connection");
 
@@ -1372,7 +1365,7 @@ module.exports =
 	var ArrayConnection = __webpack_require__(17);
 	var ObjectConnection = __webpack_require__(18);
 
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 	var BoxReflection = __webpack_require__(19);
 	var Accessor = __webpack_require__(20);
 
@@ -1781,8 +1774,8 @@ module.exports =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Reflection = __webpack_require__(2);
-	var Definition = __webpack_require__(4);
+	var Reflection = __webpack_require__(4);
+	var Definition = __webpack_require__(3);
 	module.exports = function () {
 	    function BoxReflection() {
 	        _classCallCheck(this, BoxReflection);
@@ -1826,7 +1819,7 @@ module.exports =
 	    }, {
 	        key: 'isBox',
 	        value: function isBox(box) {
-	            return box instanceof __webpack_require__(3);
+	            return box instanceof __webpack_require__(2);
 	        }
 	    }]);
 
@@ -1843,7 +1836,7 @@ module.exports =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Reflection = __webpack_require__(2);
+	var Reflection = __webpack_require__(4);
 	module.exports = function () {
 	    function Accessor() {
 	        _classCallCheck(this, Accessor);
