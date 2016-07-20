@@ -1,0 +1,13 @@
+{
+  "name": "actives",
+  "description": "actives",
+  "main": "dist/actives.js",
+  "authors": [
+    "slava hatnuke"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "actives"
+  ],
+  "homepage": "https://github.com/slavahatnuke/actives"
+}
