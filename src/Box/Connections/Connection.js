@@ -1,6 +1,8 @@
 let Observer = require('../../Actives/Observer');
 let Reflection = require('../../Reflection/Reflection');
 
+let connectionSymbol = Symbol("connection");
+
 module.exports = class Connection {
     constructor(name) {
         this.name = name;
@@ -45,8 +47,12 @@ module.exports = class Connection {
         this.observer.subscribe(observer);
     }
 
+    unsubscribe(observer) {
+        this.observer && this.observer.unsubscribe(observer);
+    }
+
     notifyObservers(box, event) {
-        this.observer && this.observer.notify(event);
+        this.observer && this.observer.notify(event, this.getState());
     }
 
     hasState() {
@@ -54,15 +60,17 @@ module.exports = class Connection {
     }
 
     getState() {
-        return this.stateValue || {};
+        return this.stateValue || this.resetState();
     }
 
     resetState() {
         this.stateValue = {};
+        this.stateValue[connectionSymbol] = this;
+        return this.stateValue;
     }
 
     applyState(state) {
-        this.stateValue = this.stateValue || {};
+        this.stateValue = this.getState();
 
         if (Reflection.isPureObject(state)) {
             Reflection.merge(this.stateValue, state);
@@ -116,10 +124,16 @@ module.exports = class Connection {
     }
 
     static subscribe(state, subscriber) {
-
+        let connection = state[connectionSymbol];
+        if(connection) {
+            connection.subscribe(subscriber)
+        }
     }
 
     static unsubscribe(state, subscriber) {
-
+        let connection = state[connectionSymbol];
+        if(connection) {
+            connection.unsubscribe(subscriber)
+        }
     }
 }

@@ -58,6 +58,7 @@ module.exports =
 	exports.Box = __webpack_require__(2);
 	exports.Reflection = __webpack_require__(4);
 	exports.BoxReflection = __webpack_require__(19);
+	exports.Connection = __webpack_require__(13);
 
 /***/ },
 /* 2 */
@@ -324,6 +325,11 @@ module.exports =
 	    }, {
 	        key: 'subscribe',
 	        value: function subscribe(observer) {
+	            if (!this.isConnected() && this.isResolved()) {
+	                this.connected = true;
+	                this.resolve(this.getValue());
+	            }
+
 	            this.connected = true;
 	            this.observer = this.observer || new Observer();
 	            this.observer.subscribe(observer);
@@ -396,7 +402,7 @@ module.exports =
 	    }, {
 	        key: 'isClass',
 	        value: function isClass(object) {
-	            return this.isFunction(object) && /^\s*class\s+/.test(object.toString());
+	            return this.isFunction(object) && (/^\s*class\s+/.test(object.toString()) || /_classCallCheck/igm.test(object.toString()));
 	        }
 	    }, {
 	        key: 'isFunction',
@@ -421,7 +427,12 @@ module.exports =
 	    }, {
 	        key: 'getMethodNames',
 	        value: function getMethodNames(object) {
-	            return Object.getOwnPropertyNames(this.getPrototype(object));
+	            var prototype = this.getPrototype(object);
+
+	            if (prototype == Object.prototype) {
+	                return [];
+	            }
+	            return Object.getOwnPropertyNames(prototype);
 	        }
 	    }, {
 	        key: 'getPrototype',
@@ -576,12 +587,24 @@ module.exports =
 	            this.observers.push(observer);
 	        }
 	    }, {
+	        key: 'unsubscribe',
+	        value: function unsubscribe(observer) {
+	            var idx = this.observers.indexOf(observer);
+	            if (idx >= 0) {
+	                this.observers.splice(idx, 1);
+	            }
+	        }
+	    }, {
 	        key: 'notify',
 	        value: function notify() {
-	            var payload = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+	            var _this = this;
+
+	            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	                args[_key] = arguments[_key];
+	            }
 
 	            this.observers.forEach(function (observer) {
-	                return observer(payload);
+	                return observer.apply(_this, args);
 	            });
 	        }
 	    }], [{
@@ -1162,6 +1185,8 @@ module.exports =
 	var Observer = __webpack_require__(5);
 	var Reflection = __webpack_require__(4);
 
+	var connectionSymbol = Symbol("connection");
+
 	module.exports = function () {
 	    function Connection(name) {
 	        _classCallCheck(this, Connection);
@@ -1215,9 +1240,14 @@ module.exports =
 	            this.observer.subscribe(observer);
 	        }
 	    }, {
+	        key: 'unsubscribe',
+	        value: function unsubscribe(observer) {
+	            this.observer && this.observer.unsubscribe(observer);
+	        }
+	    }, {
 	        key: 'notifyObservers',
 	        value: function notifyObservers(box, event) {
-	            this.observer && this.observer.notify(event);
+	            this.observer && this.observer.notify(event, this.getState());
 	        }
 	    }, {
 	        key: 'hasState',
@@ -1227,17 +1257,19 @@ module.exports =
 	    }, {
 	        key: 'getState',
 	        value: function getState() {
-	            return this.stateValue || {};
+	            return this.stateValue || this.resetState();
 	        }
 	    }, {
 	        key: 'resetState',
 	        value: function resetState() {
 	            this.stateValue = {};
+	            this.stateValue[connectionSymbol] = this;
+	            return this.stateValue;
 	        }
 	    }, {
 	        key: 'applyState',
 	        value: function applyState(state) {
-	            this.stateValue = this.stateValue || {};
+	            this.stateValue = this.getState();
 
 	            if (Reflection.isPureObject(state)) {
 	                Reflection.merge(this.stateValue, state);
@@ -1296,6 +1328,22 @@ module.exports =
 	        key: 'getStateContext',
 	        value: function getStateContext(box) {
 	            return box.context();
+	        }
+	    }], [{
+	        key: 'subscribe',
+	        value: function subscribe(state, subscriber) {
+	            var connection = state[connectionSymbol];
+	            if (connection) {
+	                connection.subscribe(subscriber);
+	            }
+	        }
+	    }, {
+	        key: 'unsubscribe',
+	        value: function unsubscribe(state, subscriber) {
+	            var connection = state[connectionSymbol];
+	            if (connection) {
+	                connection.unsubscribe(subscriber);
+	            }
 	        }
 	    }]);
 

@@ -9,8 +9,15 @@ module.exports = class Observer {
         this.observers.push(observer);
     }
 
-    notify(payload = null) {
-        this.observers.forEach((observer) => observer(payload))
+    unsubscribe(observer) {
+        var idx = this.observers.indexOf(observer);
+        if (idx >= 0) {
+            this.observers.splice(idx, 1);
+        }
+    }
+
+    notify(...args) {
+        this.observers.forEach((observer) => observer.apply(this, args))
     }
 
     static notifier(defaults) {
