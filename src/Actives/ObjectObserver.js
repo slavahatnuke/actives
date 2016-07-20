@@ -28,9 +28,7 @@ module.exports = function (origin, observer = () => null) {
 
             origin[name] = value;
 
-            // console.log('notify.locked', notify.locked);
-            // isChanged &&
-            notify({
+            isChanged && notify({
                 type: 'SET',
                 name: name,
                 value: value,

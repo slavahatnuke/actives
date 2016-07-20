@@ -1,5 +1,3 @@
-let Reflection = require('../../Reflection/Reflection');
-
 let Creator = require('./Creator');
 
 module.exports = class Factory {

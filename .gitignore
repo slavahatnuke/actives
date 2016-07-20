@@ -2,3 +2,5 @@
 *.log
 node_modules/
 coverage/
+*.tmp.js
+.DS_Store
