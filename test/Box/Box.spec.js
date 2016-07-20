@@ -1282,4 +1282,12 @@ describe('Box', () => {
         // because unsubscribed
         expect(currentState.counter).equal(4);
     });
+    
+    it('A', () => {
+        var box = actives.box;
+
+        expect(box instanceof actives.Box).to.be.true;
+        box.add('A', 1);
+        expect(box.A).equal(1);
+    });
 });

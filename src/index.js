@@ -1,6 +1,12 @@
+let Reflection = require('./Reflection/Reflection');
+let Box = require('./Box/Box');
 
-exports.Box = require('./Box/Box');
-exports.Reflection = require('./Reflection/Reflection');
+Reflection.defineName(exports, 'box', () => Box.create());
+
+exports.Box = Box;
+exports.Reflection = Reflection;
 exports.BoxReflection = require('./Box/Reflection/BoxReflection');
 exports.Connection = require('./Box/Connections/Connection');
+
+
 
