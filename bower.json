@@ -1,6 +1,7 @@
 {
   "name": "actives",
   "description": "actives",
+  "version": "0.0.3",
   "main": "dist/actives.js",
   "authors": [
     "slava hatnuke"
