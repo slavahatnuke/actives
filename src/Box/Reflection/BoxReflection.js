@@ -18,7 +18,7 @@ module.exports = class BoxReflection {
     }
 
     static addName(box, name) {
-        if (!box._names.has(name)) {
+        if (!box._names.has(name) && !(name in box)) {
             Reflection.defineName(box, name, (name) => box.get(name), (name, value) => box.add(name, value));
             box._names.set(name, name);
         }
