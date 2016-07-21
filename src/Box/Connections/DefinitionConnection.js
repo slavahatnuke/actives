@@ -1,9 +1,8 @@
 let Connection = require('./Connection');
 
 module.exports = class DefinitionConnection extends Connection {
-    constructor(name, definition) {
-        super(name);
-        this.service = definition.getName();
+    constructor(name, service, definition) {
+        super(name, service);
         this.definition = definition;
         this.context = undefined;
     }

@@ -27,4 +27,14 @@ module.exports = class BoxReflection {
     static isBox(box) {
         return box instanceof require('../Box');
     }
+
+    static clone(box) {
+        var Box = require('../Box');
+        var _box = Box.create();
+
+        this.getDefinitions(box).each((definition, name) => _box.add(name, definition.clone()));
+        this.getConnections(box).each((connection, name) => _box.connect(name, connection));
+
+        return _box;
+    }
 }

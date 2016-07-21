@@ -1,8 +1,8 @@
 let Connection = require('./Connection');
 
 module.exports = class ArrayConnection extends Connection {
-    constructor(name) {
-        super(name);
+    constructor(name, service) {
+        super(name, service);
         this.connections = undefined;
         this.context = undefined;
     }

@@ -90,9 +90,15 @@ module.exports = class Definition {
         this.meta = undefined;
     }
 
+    clone() {
+        return new Definition(this.name, this.definition, this.dependencies);
+    }
+
     static create(name, definition, dependencies) {
         if (Reflection.isFunction(definition)) {
             return new Definition(name, definition, dependencies);
+        } else if (definition instanceof Definition) {
+            return definition;
         } else if (Reflection.isPureObject(definition)) {
             var _definition = new Definition(name, definition, dependencies);
             _definition.resolve(definition);

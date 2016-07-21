@@ -86,6 +86,8 @@ module.exports = class Box {
     create(name) {
         if (this._definitions.isDefinition(name)) {
             return this._factory.create(this, this._definitions.get(name));
+        } else {
+            return BoxReflection.clone(this);
         }
     }
 

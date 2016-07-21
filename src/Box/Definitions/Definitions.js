@@ -74,5 +74,9 @@ module.exports = class Definitions {
         return Reflection.iteratorToArray(this.values.keys()).concat(Reflection.iteratorToArray(this.definitions.keys()));
     }
 
+    each(iterator) {
+        this.keys().forEach((name) => iterator(this.get(name), name));   
+    }
+
 
 };

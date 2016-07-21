@@ -1,4 +1,5 @@
 let DefinitionConnection = require('./DefinitionConnection');
+let Connection = require('./Connection');
 let ConnectionConnection = require('./ConnectionConnection');
 let ArrayConnection = require('./ArrayConnection');
 let ObjectConnection = require('./ObjectConnection');
@@ -15,8 +16,19 @@ module.exports = class Connector {
 
         let connection;
 
+        if (!connection && definitions.isDefinition(service)) {
+            var definition = definitions.get(service);
+            connection = new DefinitionConnection(name, service, definition);
+            definition.subscribe((event) => connection.notify(box, event));
+        }
+
+        if (!connection && connections.has(service)) {
+            connection = new ConnectionConnection(name);
+            connections.get(service).subscribe((event) => connection.notify(box, event));
+        }
+
         if (!connection && Reflection.isPureObject(service)) {
-            connection = new ObjectConnection(name);
+            connection = new ObjectConnection(name, service);
 
             let items = {};
 
@@ -38,7 +50,7 @@ module.exports = class Connector {
         }
 
         if (!connection && Reflection.isArray(service)) {
-            connection = new ArrayConnection(name);
+            connection = new ArrayConnection(name, service);
 
             let items = service.map((service) => {
                 var child = this.createConnection({
@@ -53,18 +65,6 @@ module.exports = class Connector {
 
             connection.setConnections(items);
         }
-
-        if (!connection && definitions.isDefinition(service)) {
-            var definition = definitions.get(service);
-            connection = new DefinitionConnection(name, definition);
-            definition.subscribe((event) => connection.notify(box, event));
-        }
-
-        if (!connection && connections.has(service)) {
-            connection = new ConnectionConnection(name);
-            connections.get(service).subscribe((event) => connection.notify(box, event));
-        }
-
 
         if (!connection && Accessor.isPath(service)) {
             let _path = Accessor.toArray(service);
@@ -94,11 +94,26 @@ module.exports = class Connector {
 
         box.remove(name);
 
-        let connection = this.createConnection({
-            name,
-            service,
-            box
-        });
+        let connection;
+
+        if (service instanceof Connection) {
+            let _connection = service;
+
+            connection = this.createConnection({
+                name,
+                service: _connection.getService(),
+                box
+            });
+
+            connection.state(_connection.stateCreator).actions(_connection.actionsCreator);
+
+        } else {
+            connection = this.createConnection({
+                name,
+                service,
+                box
+            });
+        }
 
         connections.add(connection);
 

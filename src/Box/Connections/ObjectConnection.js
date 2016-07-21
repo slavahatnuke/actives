@@ -1,8 +1,8 @@
 let Connection = require('./Connection');
 
 module.exports = class ObjectConnection extends Connection {
-    constructor(name) {
-        super(name);
+    constructor(name, service) {
+        super(name, service);
         this.connections = undefined;
         this.stateContext = undefined;
         this.actionsContext = undefined;

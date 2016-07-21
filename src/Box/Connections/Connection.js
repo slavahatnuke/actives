@@ -4,11 +4,13 @@ let Reflection = require('../../Reflection/Reflection');
 let connectionSymbol = Symbol("connection");
 
 module.exports = class Connection {
-    constructor(name) {
+    constructor(name, service) {
         this.name = name;
+        this.service = service;
 
         this.reset();
     }
+
 
     reset() {
         this.observer = undefined;
@@ -22,6 +24,10 @@ module.exports = class Connection {
 
     getName() {
         return this.name;
+    }
+    
+    getService() {
+        return this.service;
     }
 
     state(creator) {
