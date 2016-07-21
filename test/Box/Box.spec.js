@@ -1324,4 +1324,46 @@ describe('Box', () => {
         expect(box.get('Box1/CounterState/Counter/counter')).equal(5);
     });
 
+    it('connection to connection array', () => {
+
+        function Counter() {
+            this.counter = 0;
+
+            this.get = function () {
+                return this.counter;
+            }
+
+            this.up = function () {
+                this.counter++;
+            };
+
+            this.down = function () {
+                this.counter--;
+            }
+        }
+
+        var resultState;
+
+        var box = actives.Box.create();
+        box.add('Counter', () => new Counter());
+
+        box.connect('CounterButtonsState', 'Counter')
+            .state(({Counter}) => {
+                return {
+                    counter: Counter.get()
+                };
+            });
+
+        box.connect('CounterState', ['CounterButtonsState'])
+            .state(({CounterButtonsState}) => {
+                resultState = CounterButtonsState;
+                return {CounterButtonsState};
+            });
+
+        expect(box.CounterState.CounterButtonsState.counter).equal(0);
+
+        box.Counter.up();
+        expect(box.CounterState.CounterButtonsState.counter).equal(1);
+    });
+
 });

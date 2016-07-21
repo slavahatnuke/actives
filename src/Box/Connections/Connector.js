@@ -58,9 +58,17 @@ module.exports = class Connector {
                     service,
                     box
                 });
-            // console.log(service, child);
 
-                child.subscribe((event) => connection.notify(box, event));
+                child.subscribe((event) => {
+                    if (connections.has(service)) {
+                        var originalChildConnection = connections.get(service);
+                        child.resetState();
+                        child.applyState(originalChildConnection.getState());
+                    }
+
+                    return connection.notify(box, event);
+                });
+
                 return child;
             });
 

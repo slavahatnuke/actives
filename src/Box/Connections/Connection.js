@@ -12,6 +12,17 @@ module.exports = class Connection {
     }
 
 
+
+    init(box) {
+        if (!this.hasState()) {
+            this.notify(box, {
+                type: 'CONNECTION_INIT',
+                name: this.getName(),
+                box: box
+            });
+        }
+    }
+
     reset() {
         this.observer = undefined;
         this.stateCreator = undefined;
@@ -25,7 +36,7 @@ module.exports = class Connection {
     getName() {
         return this.name;
     }
-    
+
     getService() {
         return this.service;
     }
@@ -107,14 +118,14 @@ module.exports = class Connection {
         }
     }
 
-    getActionsContext(box) {
-        return box.context();
-    }
-
     callStateCreator(box) {
         if (this.stateCreator) {
             this.applyState(this.stateCreator(this.getStateContext(box)));
         }
+    }
+
+    getActionsContext(box) {
+        return box.context();
     }
 
     getOriginValue() {
@@ -131,14 +142,14 @@ module.exports = class Connection {
 
     static subscribe(state, subscriber) {
         let connection = state[connectionSymbol];
-        if(connection) {
+        if (connection) {
             connection.subscribe(subscriber)
         }
     }
 
     static unsubscribe(state, subscriber) {
         let connection = state[connectionSymbol];
-        if(connection) {
+        if (connection) {
             connection.unsubscribe(subscriber)
         }
     }
