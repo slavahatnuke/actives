@@ -168,6 +168,8 @@ var actives =
 	        value: function create(name) {
 	            if (this._definitions.isDefinition(name)) {
 	                return this._factory.create(this, this._definitions.get(name));
+	            } else {
+	                return BoxReflection.clone(this);
 	            }
 	        }
 	    }, {
@@ -349,11 +351,18 @@ var actives =
 	            this.connected = false;
 	            this.meta = undefined;
 	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone() {
+	            return new Definition(this.name, this.definition, this.dependencies);
+	        }
 	    }], [{
 	        key: 'create',
 	        value: function create(name, definition, dependencies) {
 	            if (Reflection.isFunction(definition)) {
 	                return new Definition(name, definition, dependencies);
+	            } else if (definition instanceof Definition) {
+	                return definition;
 	            } else if (Reflection.isPureObject(definition)) {
 	                var _definition = new Definition(name, definition, dependencies);
 	                _definition.resolve(definition);
@@ -841,6 +850,15 @@ var actives =
 	        value: function keys() {
 	            return Reflection.iteratorToArray(this.values.keys()).concat(Reflection.iteratorToArray(this.definitions.keys()));
 	        }
+	    }, {
+	        key: 'each',
+	        value: function each(iterator) {
+	            var _this = this;
+
+	            this.keys().forEach(function (name) {
+	                return iterator(_this.get(name), name);
+	            });
+	        }
 	    }]);
 
 	    return Definitions;
@@ -1161,6 +1179,15 @@ var actives =
 	            return Reflection.iteratorToArray(this.connections.keys());
 	        }
 	    }, {
+	        key: 'each',
+	        value: function each(iterator) {
+	            var _this = this;
+
+	            this.keys().forEach(function (name) {
+	                return iterator(_this.get(name), name);
+	            });
+	        }
+	    }, {
 	        key: 'remove',
 	        value: function remove(name) {
 	            if (this.has(name)) {
@@ -1188,10 +1215,11 @@ var actives =
 	var connectionSymbol = Symbol("connection");
 
 	module.exports = function () {
-	    function Connection(name) {
+	    function Connection(name, service) {
 	        _classCallCheck(this, Connection);
 
 	        this.name = name;
+	        this.service = service;
 
 	        this.reset();
 	    }
@@ -1211,6 +1239,11 @@ var actives =
 	        key: 'getName',
 	        value: function getName() {
 	            return this.name;
+	        }
+	    }, {
+	        key: 'getService',
+	        value: function getService() {
+	            return this.service;
 	        }
 	    }, {
 	        key: 'state',
@@ -1361,6 +1394,7 @@ var actives =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var DefinitionConnection = __webpack_require__(15);
+	var Connection = __webpack_require__(13);
 	var ConnectionConnection = __webpack_require__(16);
 	var ArrayConnection = __webpack_require__(17);
 	var ObjectConnection = __webpack_require__(18);
@@ -1389,8 +1423,23 @@ var actives =
 
 	            var connection = void 0;
 
+	            if (!connection && definitions.isDefinition(service)) {
+	                var definition = definitions.get(service);
+	                connection = new DefinitionConnection(name, service, definition);
+	                definition.subscribe(function (event) {
+	                    return connection.notify(box, event);
+	                });
+	            }
+
+	            if (!connection && connections.has(service)) {
+	                connection = new ConnectionConnection(name);
+	                connections.get(service).subscribe(function (event) {
+	                    return connection.notify(box, event);
+	                });
+	            }
+
 	            if (!connection && Reflection.isPureObject(service)) {
-	                connection = new ObjectConnection(name);
+	                connection = new ObjectConnection(name, service);
 
 	                var items = {};
 
@@ -1414,7 +1463,7 @@ var actives =
 	            }
 
 	            if (!connection && Reflection.isArray(service)) {
-	                connection = new ArrayConnection(name);
+	                connection = new ArrayConnection(name, service);
 
 	                var _items = service.map(function (service) {
 	                    var child = _this.createConnection({
@@ -1430,21 +1479,6 @@ var actives =
 	                });
 
 	                connection.setConnections(_items);
-	            }
-
-	            if (!connection && definitions.isDefinition(service)) {
-	                var definition = definitions.get(service);
-	                connection = new DefinitionConnection(name, definition);
-	                definition.subscribe(function (event) {
-	                    return connection.notify(box, event);
-	                });
-	            }
-
-	            if (!connection && connections.has(service)) {
-	                connection = new ConnectionConnection(name);
-	                connections.get(service).subscribe(function (event) {
-	                    return connection.notify(box, event);
-	                });
 	            }
 
 	            if (!connection && Accessor.isPath(service)) {
@@ -1480,11 +1514,25 @@ var actives =
 
 	            box.remove(name);
 
-	            var connection = this.createConnection({
-	                name: name,
-	                service: service,
-	                box: box
-	            });
+	            var connection = void 0;
+
+	            if (service instanceof Connection) {
+	                var _connection = service;
+
+	                connection = this.createConnection({
+	                    name: name,
+	                    service: _connection.getService(),
+	                    box: box
+	                });
+
+	                connection.state(_connection.stateCreator).actions(_connection.actionsCreator);
+	            } else {
+	                connection = this.createConnection({
+	                    name: name,
+	                    service: service,
+	                    box: box
+	                });
+	            }
 
 	            connections.add(connection);
 
@@ -1518,12 +1566,11 @@ var actives =
 	module.exports = function (_Connection) {
 	    _inherits(DefinitionConnection, _Connection);
 
-	    function DefinitionConnection(name, definition) {
+	    function DefinitionConnection(name, service, definition) {
 	        _classCallCheck(this, DefinitionConnection);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DefinitionConnection).call(this, name));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DefinitionConnection).call(this, name, service));
 
-	        _this.service = definition.getName();
 	        _this.definition = definition;
 	        _this.context = undefined;
 	        return _this;
@@ -1596,10 +1643,10 @@ var actives =
 	module.exports = function (_Connection) {
 	    _inherits(ArrayConnection, _Connection);
 
-	    function ArrayConnection(name) {
+	    function ArrayConnection(name, service) {
 	        _classCallCheck(this, ArrayConnection);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ArrayConnection).call(this, name));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ArrayConnection).call(this, name, service));
 
 	        _this.connections = undefined;
 	        _this.context = undefined;
@@ -1678,10 +1725,10 @@ var actives =
 	module.exports = function (_Connection) {
 	    _inherits(ObjectConnection, _Connection);
 
-	    function ObjectConnection(name) {
+	    function ObjectConnection(name, service) {
 	        _classCallCheck(this, ObjectConnection);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ObjectConnection).call(this, name));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ObjectConnection).call(this, name, service));
 
 	        _this.connections = undefined;
 	        _this.stateContext = undefined;
@@ -1820,6 +1867,21 @@ var actives =
 	        key: 'isBox',
 	        value: function isBox(box) {
 	            return box instanceof __webpack_require__(2);
+	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone(box) {
+	            var Box = __webpack_require__(2);
+	            var _box = Box.create();
+
+	            this.getDefinitions(box).each(function (definition, name) {
+	                return _box.add(name, definition.clone());
+	            });
+	            this.getConnections(box).each(function (connection, name) {
+	                return _box.connect(name, connection);
+	            });
+
+	            return _box;
 	        }
 	    }]);
 
