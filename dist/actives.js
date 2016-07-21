@@ -1459,8 +1459,11 @@ var actives =
 	                    items[name] = child;
 
 	                    child.subscribe(function (event) {
-	                        if (connections.has(value)) {
-	                            var originalChildConnection = connections.get(value);
+	                        var result = Connector.getBoxPath(box, value);
+	                        var connections = BoxReflection.getConnections(result.box);
+
+	                        if (connections.has(result.service)) {
+	                            var originalChildConnection = connections.get(result.service);
 	                            child.resetState();
 	                            child.applyState(originalChildConnection.getState());
 	                        }
@@ -1498,19 +1501,12 @@ var actives =
 	            }
 
 	            if (!connection && Accessor.isPath(service)) {
-	                var _path = Accessor.toArray(service);
-	                var _service = _path.pop();
-
-	                var _box = Accessor.path(_path)(box);
-	                if (BoxReflection.isBox(_box)) {
-	                    connection = this.createConnection({
-	                        name: name,
-	                        service: _service,
-	                        box: _box
-	                    });
-	                } else {
-	                    throw new Error('Unexpected path to connected service: ' + service);
-	                }
+	                var _result = Connector.getBoxPath(box, service);
+	                connection = this.createConnection({
+	                    name: name,
+	                    service: _result.service,
+	                    box: _result.box
+	                });
 	            }
 
 	            if (!connection) {
@@ -1555,6 +1551,30 @@ var actives =
 	            BoxReflection.addName(box, name);
 
 	            return connection;
+	        }
+	    }, {
+	        key: 'getBoxPath',
+	        value: function getBoxPath(box, path) {
+
+	            if (Accessor.isPath(path)) {
+	                var _path = Accessor.toArray(path);
+	                var service = _path.pop();
+
+	                var _box = Accessor.path(_path)(box);
+	                if (BoxReflection.isBox(_box)) {
+	                    return {
+	                        box: _box,
+	                        service: service
+	                    };
+	                } else {
+	                    throw new Error('Unexpected path to connected service: ' + service);
+	                }
+	            } else {
+	                return {
+	                    box: box,
+	                    service: path
+	                };
+	            }
 	        }
 	    }]);
 
