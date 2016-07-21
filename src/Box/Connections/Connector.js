@@ -43,7 +43,15 @@ module.exports = class Connector {
 
                 items[name] = child;
 
-                child.subscribe((event) => connection.notify(box, event));
+
+                child.subscribe((event) => {
+                    if (connections.has(value)) {
+                        var originalChildConnection = connections.get(value);
+                        child.resetState();
+                        child.applyState(originalChildConnection.getState());
+                    }
+                    return connection.notify(box, event);
+                });
             }
 
             connection.setConnections(items);

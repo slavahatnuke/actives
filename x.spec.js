@@ -33,7 +33,7 @@ describe('x.js', () => {
                 };
             });
 
-        box.connect('CounterState', ['CounterButtonsState'])
+        box.connect('CounterState', {CounterButtonsState: 'CounterButtonsState'})
             .state(({CounterButtonsState}) => {
                 resultState = CounterButtonsState;
                 return {CounterButtonsState};
