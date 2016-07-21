@@ -58,7 +58,7 @@ module.exports = class Connector {
                     service,
                     box
                 });
-            console.log(service, child);
+            // console.log(service, child);
 
                 child.subscribe((event) => connection.notify(box, event));
                 return child;
