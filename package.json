@@ -6,18 +6,14 @@
   "scripts": {
     "test": "mocha --recursive",
     "test.watch": "mocha --watch --recursive",
-
     "test.x": "mocha x.spec.js",
     "test.x.watch": "mocha --watch x.spec.js",
-
     "cover": "node_modules/isparta/bin/isparta cover --report html node_modules/mocha/bin/_mocha -- --recursive",
     "cover.watch": "nodemon -x 'npm run cover'",
-
     "build.es5": "echo 'module.exports = ' > es5.js && cat dist/es5.tmp.js >> es5.js",
     "build.es5.browser": "echo 'var actives = ' > dist/actives.js && cat dist/es5.tmp.js >> dist/actives.js",
     "build.es5.browser.min": "uglifyjs dist/actives.js -c -m -o dist/actives.min.js",
     "build": "webpack && npm run build.es5 && npm run build.es5.browser && npm run build.es5.browser.min",
-
     "test.es5": "VERSION=es5 mocha --recursive",
     "test.es5.browser": "VERSION=es5.browser mocha --recursive",
     "test.es5.browser.min": "VERSION=es5.browser.min mocha --recursive",
@@ -38,6 +34,9 @@
   },
   "homepage": "https://github.com/slavahatnuke/actives#readme",
   "dependencies": {},
+  "pre-push": [
+    "npm run build.and.test"
+  ],
   "devDependencies": {
     "babel-core": "^6.10.4",
     "babel-loader": "^6.2.4",
@@ -47,6 +46,7 @@
     "isparta": "^4.0.0",
     "mocha": "^2.5.3",
     "nodemon": "^1.9.2",
+    "pre-push": "^0.1.1",
     "uglify-js": "^2.7.0",
     "webpack": "^1.13.1"
   }
