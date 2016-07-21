@@ -130,14 +130,7 @@ module.exports =
 	            }
 
 	            if (this._connections.has(name)) {
-	                if (!this._connections.get(name).hasState()) {
-	                    this._connections.get(name).notify(this, {
-	                        type: 'CONNECTION_INIT',
-	                        name: name,
-	                        box: this
-	                    });
-	                }
-
+	                this._connections.get(name).init(this);
 	                return this._connections.get(name).getState();
 	            }
 
@@ -1225,6 +1218,17 @@ module.exports =
 	    }
 
 	    _createClass(Connection, [{
+	        key: 'init',
+	        value: function init(box) {
+	            if (!this.hasState()) {
+	                this.notify(box, {
+	                    type: 'CONNECTION_INIT',
+	                    name: this.getName(),
+	                    box: box
+	                });
+	            }
+	        }
+	    }, {
 	        key: 'reset',
 	        value: function reset() {
 	            this.observer = undefined;
@@ -1336,16 +1340,16 @@ module.exports =
 	            }
 	        }
 	    }, {
-	        key: 'getActionsContext',
-	        value: function getActionsContext(box) {
-	            return box.context();
-	        }
-	    }, {
 	        key: 'callStateCreator',
 	        value: function callStateCreator(box) {
 	            if (this.stateCreator) {
 	                this.applyState(this.stateCreator(this.getStateContext(box)));
 	            }
+	        }
+	    }, {
+	        key: 'getActionsContext',
+	        value: function getActionsContext(box) {
+	            return box.context();
 	        }
 	    }, {
 	        key: 'getOriginValue',
@@ -1432,7 +1436,7 @@ module.exports =
 	            }
 
 	            if (!connection && connections.has(service)) {
-	                connection = new ConnectionConnection(name);
+	                connection = new ConnectionConnection(name, service);
 	                connections.get(service).subscribe(function (event) {
 	                    return connection.notify(box, event);
 	                });
@@ -1473,8 +1477,15 @@ module.exports =
 	                    });
 
 	                    child.subscribe(function (event) {
+	                        if (connections.has(service)) {
+	                            var originalChildConnection = connections.get(service);
+	                            child.resetState();
+	                            child.applyState(originalChildConnection.getState());
+	                        }
+
 	                        return connection.notify(box, event);
 	                    });
+
 	                    return child;
 	                });
 
