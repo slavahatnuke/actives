@@ -35,7 +35,7 @@
   "homepage": "https://github.com/slavahatnuke/actives#readme",
   "dependencies": {},
   "pre-push": [
-    "npm run build.and.test"
+    "build.and.test"
   ],
   "devDependencies": {
     "babel-core": "^6.10.4",
