@@ -1459,6 +1459,11 @@ module.exports =
 	                    items[name] = child;
 
 	                    child.subscribe(function (event) {
+	                        if (connections.has(value)) {
+	                            var originalChildConnection = connections.get(value);
+	                            child.resetState();
+	                            child.applyState(originalChildConnection.getState());
+	                        }
 	                        return connection.notify(box, event);
 	                    });
 	                }
