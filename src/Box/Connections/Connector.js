@@ -23,7 +23,7 @@ module.exports = class Connector {
         }
 
         if (!connection && connections.has(service)) {
-            connection = new ConnectionConnection(name);
+            connection = new ConnectionConnection(name, service);
             connections.get(service).subscribe((event) => connection.notify(box, event));
         }
 
@@ -58,6 +58,7 @@ module.exports = class Connector {
                     service,
                     box
                 });
+            console.log(service, child);
 
                 child.subscribe((event) => connection.notify(box, event));
                 return child;

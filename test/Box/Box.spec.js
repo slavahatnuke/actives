@@ -927,7 +927,7 @@ describe('Box', () => {
             expect(box.get('view/counter')).equal(1);
             expect(callCounter).equal(4);
             done();
-        }, 20);
+        }, 50);
     });
 
 
@@ -979,7 +979,7 @@ describe('Box', () => {
             expect(box.get('view/counter')).equal(1);
             expect(callCounter).equal(4);
             done();
-        }, 20);
+        }, 50);
     });
 
 

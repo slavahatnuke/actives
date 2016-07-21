@@ -4,43 +4,50 @@ var actives = require('./test/actives');
 describe('x.js', () => {
 
     it('A', () => {
-        var child = actives.Box.create();
-        child.add('Counter', () => {
-            return {
-                counter: 1
-            };
-        });
 
-        child.connect('CounterState', 'Counter')
-            .state(({Counter}) => {
-                return {Counter};
-            });
+        function Counter() {
+            this.counter = 0;
+
+            this.get = function () {
+                return this.counter;
+            }
+
+            this.up = function () {
+                this.counter++;
+            };
+
+            this.down = function () {
+                this.counter--;
+            }
+        }
+
+        var resultState;
 
         var box = actives.Box.create();
+        box.add('Counter', () => new Counter());
 
-        box.add('Box1', child);
-        box.add('Box2', child.create());
+        box.connect('CounterButtonsState', 'Counter')
+            .state(({Counter}) => {
+                return {
+                    x: Counter.get()
+                };
+            });
 
-        expect(box.get('Box1/Counter/counter')).equal(1);
-        expect(box.get('Box1/CounterState/Counter/counter')).equal(1);
+        box.connect('CounterState', ['CounterButtonsState'])
+            .state(({CounterButtonsState}) => {
+                resultState = CounterButtonsState;
+            });
 
-        expect(box.get('Box2/Counter/counter')).equal(1);
-        expect(box.get('Box2/CounterState/Counter/counter')).equal(1);
+        box.add('CounterView', ({CounterState}) => CounterState);
 
+        box.CounterView;
 
-        box.Box1.Counter.counter = 5;
-        expect(box.get('Box1/Counter/counter')).equal(5);
-        expect(box.get('Box1/CounterState/Counter/counter')).equal(5);
+        expect(resultState.x).equal(0);
+        box.Counter.up();
+        expect(resultState.x).equal(1);
+        // console.log(box.CounterState);
+        // console.log(box.CounterState);
 
-        expect(box.get('Box2/Counter/counter')).equal(1);
-        expect(box.get('Box2/CounterState/Counter/counter')).equal(1);
-
-        box.Box2.Counter.counter = 31;
-        expect(box.get('Box2/Counter/counter')).equal(31);
-        expect(box.get('Box2/CounterState/Counter/counter')).equal(31);
-
-        expect(box.get('Box1/Counter/counter')).equal(5);
-        expect(box.get('Box1/CounterState/Counter/counter')).equal(5);
     });
 
 });
