@@ -21,27 +21,27 @@ describe('x.js', () => {
             }
         }
 
-        var resultState;
-
-        var box = actives.Box.create();
-        box.add('Counter', () => new Counter());
-
-        box.connect('CounterButtonsState', 'Counter')
+        var childBox = actives.Box.create();
+        childBox.add('Counter', () => new Counter());
+        childBox.connect('CounterButtonsState', 'Counter')
             .state(({Counter}) => {
                 return {
                     counter: Counter.get()
                 };
             });
 
-        box.connect('CounterState', {CounterButtonsState: 'CounterButtonsState'})
+
+        var box = actives.Box.create();
+        box.add('child', childBox);
+
+        box.connect('CounterState', {CounterButtonsState: 'child/CounterButtonsState'})
             .state(({CounterButtonsState}) => {
-                resultState = CounterButtonsState;
                 return {CounterButtonsState};
             });
 
         expect(box.CounterState.CounterButtonsState.counter).equal(0);
 
-        box.Counter.up();
+        childBox.Counter.up();
         expect(box.CounterState.CounterButtonsState.counter).equal(1);
     });
 
