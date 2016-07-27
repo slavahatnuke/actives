@@ -552,12 +552,19 @@ module.exports =
 	        }
 	    }, {
 	        key: 'merge',
-	        value: function merge() {
-	            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	                args[_key] = arguments[_key];
+	        value: function merge(subject) {
+	            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	                args[_key - 1] = arguments[_key];
 	            }
 
-	            return Object.assign.apply(Object, args);
+	            args.forEach(function (arg) {
+	                for (var i in arg) {
+	                    subject[i] = arg[i];
+	                }
+	            });
+	            return subject;
+
+	            // return Object.assign.apply(Object, args);
 	        }
 	    }]);
 

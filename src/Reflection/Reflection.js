@@ -38,8 +38,8 @@ module.exports = class Reflection {
 
     static getMethodNames(object) {
         var prototype = this.getPrototype(object);
-        
-        if(prototype == Object.prototype) {
+
+        if (prototype == Object.prototype) {
             return [];
         }
         return Object.getOwnPropertyNames(prototype);
@@ -119,8 +119,12 @@ module.exports = class Reflection {
         return [...new Set(names)];
     }
 
-    static merge(...args) {
-        return Object.assign.apply(Object, args);
+    static merge(subject, ...args) {
+        args.forEach((arg) => {
+            for (var i in arg) {
+                subject[i] = arg[i];
+            }
+        });
+        return subject;
     }
-
 }
