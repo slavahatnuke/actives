@@ -3,46 +3,40 @@ var actives = require('./test/actives');
 
 describe('x.js', () => {
 
-    it('A', () => {
+    it('A', (done) => {
 
-        function Counter() {
-            this.counter = 0;
-
-            this.get = function () {
-                return this.counter;
+        class Counter {
+            constructor() {
+                this.counter = 0;
             }
 
-            this.up = function () {
-                this.counter++;
-            };
+            up(step) {
+                this.counter += step;
+            }
 
-            this.down = function () {
-                this.counter--;
+            update() {
+                setTimeout(() => this.up(120), 5);
             }
         }
 
-        var childBox = actives.Box.create();
-        childBox.add('Counter', () => new Counter());
-        childBox.connect('CounterButtonsState', 'Counter')
-            .state(({Counter}) => {
-                return {
-                    counter: Counter.get()
-                };
-            });
+        let box = new actives.Box;
 
+        box.add('Counter', Counter);
 
-        var box = actives.Box.create();
-        box.add('child', childBox);
+        let state;
 
-        box.connect('CounterState', {CounterButtonsState: 'child/CounterButtonsState'})
-            .state(({CounterButtonsState}) => {
-                return {CounterButtonsState};
-            });
+        box.connect('CounterState', 'Counter').state(({Counter}) => {
+            state = Counter;
 
-        expect(box.CounterState.CounterButtonsState.counter).equal(0);
+            console.log('state', state);
+        });
 
-        childBox.Counter.up();
-        expect(box.CounterState.CounterButtonsState.counter).equal(1);
+        box.Counter.update();
+
+        setTimeout(() => {
+            expect(state.counter).equal(120);
+            done();
+        }, 50);
     });
 
 });
