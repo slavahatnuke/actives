@@ -1239,7 +1239,6 @@ describe('Box', () => {
 
         box.connect('CounterState', 'Counter')
             .state(({Counter}) => {
-                // console.log(Counter);
                 return {
                     counter: Counter.counter
                 }
