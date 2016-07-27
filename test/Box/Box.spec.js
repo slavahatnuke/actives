@@ -1477,8 +1477,6 @@ describe('Box', () => {
 
         box.connect('CounterState', 'Counter').state(({Counter}) => {
             state = Counter;
-
-            console.log('state', state);
         });
 
         box.Counter.update();
