@@ -563,8 +563,6 @@ var actives =
 	                }
 	            });
 	            return subject;
-
-	            // return Object.assign.apply(Object, args);
 	        }
 	    }]);
 

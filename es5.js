@@ -563,8 +563,6 @@ module.exports =
 	                }
 	            });
 	            return subject;
-
-	            // return Object.assign.apply(Object, args);
 	        }
 	    }]);
 
