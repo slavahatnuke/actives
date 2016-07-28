@@ -69,7 +69,9 @@ module.exports = class Connection {
     }
 
     notifyObservers(box, event) {
-        this.observer && this.observer.notify(event, this.getState());
+        var state = this.getState();
+        state[connectionSymbol] && delete state[connectionSymbol];
+        this.observer && this.observer.notify(event, state);
     }
 
     hasState() {
@@ -77,12 +79,13 @@ module.exports = class Connection {
     }
 
     getState() {
-        return this.stateValue || this.resetState();
+        var state = this.stateValue || this.resetState();
+        state[connectionSymbol] = this;
+        return state;
     }
 
     resetState() {
         this.stateValue = {};
-        this.stateValue[connectionSymbol] = this;
         return this.stateValue;
     }
 

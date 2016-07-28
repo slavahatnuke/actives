@@ -1289,7 +1289,9 @@ module.exports =
 	    }, {
 	        key: 'notifyObservers',
 	        value: function notifyObservers(box, event) {
-	            this.observer && this.observer.notify(event, this.getState());
+	            var state = this.getState();
+	            state[connectionSymbol] && delete state[connectionSymbol];
+	            this.observer && this.observer.notify(event, state);
 	        }
 	    }, {
 	        key: 'hasState',
@@ -1299,13 +1301,14 @@ module.exports =
 	    }, {
 	        key: 'getState',
 	        value: function getState() {
-	            return this.stateValue || this.resetState();
+	            var state = this.stateValue || this.resetState();
+	            state[connectionSymbol] = this;
+	            return state;
 	        }
 	    }, {
 	        key: 'resetState',
 	        value: function resetState() {
 	            this.stateValue = {};
-	            this.stateValue[connectionSymbol] = this;
 	            return this.stateValue;
 	        }
 	    }, {
