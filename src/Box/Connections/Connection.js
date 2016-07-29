@@ -1,7 +1,7 @@
 let Observer = require('../../Actives/Observer');
 let Reflection = require('../../Reflection/Reflection');
 
-let connectionSymbol = Symbol ? Symbol("connection") : '___Symbol__connection';
+let connectionSymbol =  '___Symbol__connection';
 
 module.exports = class Connection {
     constructor(name, service) {

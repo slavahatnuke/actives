@@ -1216,7 +1216,7 @@ var actives =
 	var Observer = __webpack_require__(5);
 	var Reflection = __webpack_require__(4);
 
-	var connectionSymbol = Symbol ? Symbol("connection") : '___Symbol__connection';
+	var connectionSymbol = '___Symbol__connection';
 
 	module.exports = function () {
 	    function Connection(name, service) {
