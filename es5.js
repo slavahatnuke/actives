@@ -456,6 +456,7 @@ module.exports =
 	        value: function defineName(context, name) {
 	            var onGet = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	            var onSet = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+	            var hidden = arguments.length <= 4 || arguments[4] === undefined ? false : arguments[4];
 
 	            var description = {};
 
@@ -469,6 +470,11 @@ module.exports =
 	                description.set = function (value) {
 	                    return onSet(name, value);
 	                };
+	            }
+
+	            if (hidden) {
+	                description.configurable = true;
+	                description.enumerable = false;
 	            }
 
 	            Object.defineProperty(context, name, description);
@@ -1210,7 +1216,7 @@ module.exports =
 	var Observer = __webpack_require__(5);
 	var Reflection = __webpack_require__(4);
 
-	var connectionSymbol = Symbol("connection");
+	var connectionSymbol = Symbol ? Symbol("connection") : '___Symbol__connection';
 
 	module.exports = function () {
 	    function Connection(name, service) {
@@ -1290,8 +1296,7 @@ module.exports =
 	        key: 'notifyObservers',
 	        value: function notifyObservers(box, event) {
 	            var state = this.getState();
-	            state[connectionSymbol] && delete state[connectionSymbol];
-	            this.observer && this.observer.notify(event, state);
+	            this.observer && this.observer.notify(event, Connection.clearState(state));
 	        }
 	    }, {
 	        key: 'hasState',
@@ -1302,7 +1307,7 @@ module.exports =
 	        key: 'getState',
 	        value: function getState() {
 	            var state = this.stateValue || this.resetState();
-	            state[connectionSymbol] = this;
+	            Connection.defineSymbol(state, this);
 	            return state;
 	        }
 	    }, {
@@ -1375,6 +1380,11 @@ module.exports =
 	            return box.context();
 	        }
 	    }], [{
+	        key: 'isStateObject',
+	        value: function isStateObject(state) {
+	            return state[connectionSymbol];
+	        }
+	    }, {
 	        key: 'subscribe',
 	        value: function subscribe(state, subscriber) {
 	            var connection = state[connectionSymbol];
@@ -1389,6 +1399,30 @@ module.exports =
 	            if (connection) {
 	                connection.unsubscribe(subscriber);
 	            }
+	        }
+	    }, {
+	        key: 'clearState',
+	        value: function clearState(state) {
+	            if (Connection.isStateObject(state)) {
+	                state[connectionSymbol] && delete state[connectionSymbol];
+	            }
+
+	            return state;
+	        }
+	    }, {
+	        key: 'defineSymbol',
+	        value: function defineSymbol(state, connection) {
+	            if (Reflection.isString(connectionSymbol)) {
+	                if (!Connection.isStateObject(state)) {
+	                    Reflection.defineName(state, connectionSymbol, function () {
+	                        return connection;
+	                    }, null, true);
+	                }
+	            } else {
+	                state[connectionSymbol] = connection;
+	            }
+
+	            return state;
 	        }
 	    }]);
 
