@@ -1,7 +1,7 @@
 let Observer = require('../../Actives/Observer');
 let Reflection = require('../../Reflection/Reflection');
 
-let connectionSymbol = Symbol("connection");
+let connectionSymbol = Symbol ? Symbol("connection") : '___Symbol__connection';
 
 module.exports = class Connection {
     constructor(name, service) {
@@ -10,7 +10,6 @@ module.exports = class Connection {
 
         this.reset();
     }
-
 
 
     init(box) {
@@ -70,8 +69,7 @@ module.exports = class Connection {
 
     notifyObservers(box, event) {
         var state = this.getState();
-        state[connectionSymbol] && delete state[connectionSymbol];
-        this.observer && this.observer.notify(event, state);
+        this.observer && this.observer.notify(event, Connection.clearState(state));
     }
 
     hasState() {
@@ -80,7 +78,7 @@ module.exports = class Connection {
 
     getState() {
         var state = this.stateValue || this.resetState();
-        state[connectionSymbol] = this;
+        Connection.defineSymbol(state, this);
         return state;
     }
 
@@ -143,6 +141,10 @@ module.exports = class Connection {
         return box.context();
     }
 
+    static isStateObject(state) {
+        return state[connectionSymbol];
+    }
+
     static subscribe(state, subscriber) {
         let connection = state[connectionSymbol];
         if (connection) {
@@ -156,4 +158,24 @@ module.exports = class Connection {
             connection.unsubscribe(subscriber)
         }
     }
-}
+
+    static clearState(state) {
+        if (Connection.isStateObject(state)) {
+            state[connectionSymbol] && delete state[connectionSymbol];
+        }
+
+        return state;
+    }
+
+    static defineSymbol(state, connection) {
+        if (Reflection.isString(connectionSymbol)) {
+            if (!Connection.isStateObject(state)) {
+                Reflection.defineName(state, connectionSymbol, () => connection, null, true);
+            }
+        } else {
+            state[connectionSymbol] = connection;
+        }
+
+        return state;
+    }
+};

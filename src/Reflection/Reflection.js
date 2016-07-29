@@ -57,7 +57,7 @@ module.exports = class Reflection {
         return Object.keys(object);
     }
 
-    static defineName(context, name, onGet = null, onSet = null) {
+    static defineName(context, name, onGet = null, onSet = null, hidden = false) {
         var description = {};
 
         if (onGet) {
@@ -66,6 +66,11 @@ module.exports = class Reflection {
 
         if (onSet) {
             description.set = (value) => onSet(name, value);
+        }
+
+        if (hidden) {
+            description.configurable = true;
+            description.enumerable = false;
         }
 
         Object.defineProperty(context, name, description);
