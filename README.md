@@ -20,7 +20,6 @@ import connect from 'actives-react';
 Pure logic and view.
 ```javascript
 // pure logic, it means that logic does not know about view
-// pure logic, it means that logic does not know about view
 class Counter {
     constructor() {
         this.counter = 0;
