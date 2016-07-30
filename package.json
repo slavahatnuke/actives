@@ -1,6 +1,6 @@
 {
   "name": "actives",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "actives - pure logic (PW) <-> pure view (PW)",
   "main": "index.js",
   "scripts": {

@@ -86,6 +86,6 @@ counter.go();
 It's an example with the simplest counter to get an idea. [example](https://github.com/slavahatnuke/actives-reactjs-counter-example)
 
 ### Todos example
-It's an example with todo list. Follow to get more ideas [example](https://github.com/slavahatnuke/react-native-todos-example)
+It's an example with todo list. Follow to get more ideas [example](https://github.com/slavahatnuke/actives-reactjs-todos-example)
 
 
