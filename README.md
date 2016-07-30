@@ -1,6 +1,6 @@
 # actives
 
-The main idea of `actives` to have ability to write `pure logic` and `pure views`.
+The main idea of `actives` to have ability to write `pure logic` (PL) and `pure views` (PW). (PL) <-> (PW).
 Then we connect both (logic and views) for your goals and we get a real view.
 
 It's only concept for now an example below.
@@ -17,6 +17,7 @@ import {render} from 'react-dom';
 import {Box} from 'actives';
 import connect from 'actives-react';
 ```
+
 Pure logic and view.
 ```javascript
 // pure logic, it means that logic does not know about view
@@ -82,9 +83,9 @@ counter.go();
 ```
 
 ### Counter example on GitHub 
-It an example with the simplest counter to get an idea. [example](https://github.com/slavahatnuke/actives-reactjs-counter-example)
+It's an example with the simplest counter to get an idea. [example](https://github.com/slavahatnuke/actives-reactjs-counter-example)
 
 ### Todos example
-It an example with todo list. Follow to get more ideas [example](https://github.com/slavahatnuke/react-native-todos-example)
+It's an example with todo list. Follow to get more ideas [example](https://github.com/slavahatnuke/react-native-todos-example)
 
 
