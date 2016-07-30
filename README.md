@@ -8,6 +8,7 @@ It's only concept for now an example below.
 ## Example
 There is an example with reactjs view.
 
+
 There are some required packages.
 ```javascript
 import React from 'react';
@@ -19,9 +20,14 @@ import connect from 'actives-react';
 Pure logic and view.
 ```javascript
 // pure logic, it means that logic does not know about view
+// pure logic, it means that logic does not know about view
 class Counter {
     constructor() {
         this.counter = 0;
+    }
+
+    go() {
+        setInterval(() => this.up(), 1000);
     }
 
     up() {
@@ -41,9 +47,8 @@ let CounterView = ({counter, onUp}) => {
 
 Make box and define state.
 ```javascript
-// lets make state for counter
+// let's make state for counter
 let box = new Box;
-
 // add counter to the box
 box.add('counter', Counter);
 
@@ -61,19 +66,26 @@ box.connect('counterState', 'counter')
     });
 ```
 
-Connect state/actiions to the view and render.
+Connect state/actions to the view and render.
 ```javascript
 // connect state with view, view should not know about real logic
-let CounterWidget = connect(box.counterState)(CounterView);
+let CounterWidget = connect(box.counterState, CounterView);
 
-// render widget now it's connected to state and will react on changes.
+// render widget now it's connected to state. And it will react on changes.
 render(<CounterWidget />, document.getElementById('app'));
 ```
-you can manipulate with `counter` now and it will present view
+
+You can manipulate `counter` (logic instance). And it will present view.
 ```javascript
-// you can manipulate `counter`
+// lets GO!
 let counter = box.counter;
-setInterval(() => counter.up(), 1000);
+counter.go();
 ```
 
-[This exaple on github](https://github.com/slavahatnuke/actives-reactjs-counter-example)
+### Counter example on GitHub 
+It an example with the simplest counter to get an idea. [example](https://github.com/slavahatnuke/actives-reactjs-counter-example)
+
+### Todos example
+It an example with todo list. Follow to get more ideas [example](https://github.com/slavahatnuke/react-native-todos-example)
+
+
