@@ -1,6 +1,6 @@
 # actives
 
-The main idea of `actives` to have ability to write `pure logic` (PL) and `pure views` (PW). (PL) <-> (PW).
+The main idea of `actives` to have ability to write `pure logic` (PL) and `pure views` (PV). (PL) <-> (PV).
 Then we connect both (logic and views) for your goals and we get a real view.
 
 It's only concept for now an example below.

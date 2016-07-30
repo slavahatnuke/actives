@@ -1,7 +1,7 @@
 {
   "name": "actives",
-  "version": "0.0.16",
-  "description": "actives - pure logic (PL) - pure view (PW)",
+  "version": "0.0.17",
+  "description": "actives - pure logic (PL) - pure view (PV)",
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive",
