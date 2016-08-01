@@ -85,7 +85,12 @@ counter.go();
 ### Counter example on GitHub 
 It's an example with the simplest counter to get an idea. [example](https://github.com/slavahatnuke/actives-reactjs-counter-example)
 
-### Todos example
+### Todos example on GitHub
 It's an example with todo list. Follow to get more ideas [example](https://github.com/slavahatnuke/actives-reactjs-todos-example)
+
+### React-native + Web app, example on GitHub
+Two apps - Web and Mobile Native apps with same codebase. It's an example with the simplest counter. To get ideas simply. 
+[example](https://github.com/slavahatnuke/actives-react-native-and-web-counter)
+
 
 
